@@ -1,4 +1,4 @@
-.PHONY: help bootstrap data data-resume test test-int test-live test-all lint typecheck ci verify-p1 clean-data
+.PHONY: help bootstrap data data-resume test test-int test-live test-all lint typecheck ci verify-p1 verify-p2 parse chunk links process clean-data
 
 VENV ?= .venv
 PYTHON ?= $(VENV)/bin/python
@@ -12,6 +12,10 @@ help:
 	@echo "  bootstrap    - Set up venv and install dependencies"
 	@echo "  data         - Run official RBI corpus acquisition"
 	@echo "  data-resume  - Resume interrupted corpus acquisition"
+	@echo "  process      - Run full parsing, cleaning, linking, and chunking"
+	@echo "  parse        - Run document parsing and text cleaning"
+	@echo "  links        - Extract references and supersession graph"
+	@echo "  chunk        - Generate structured chunks"
 	@echo "  test         - Run fast unit tests"
 	@echo "  test-int     - Run integration tests (no network)"
 	@echo "  test-live    - Run live tests against real RBI endpoints"
@@ -20,6 +24,7 @@ help:
 	@echo "  typecheck    - Run mypy type checker"
 	@echo "  ci           - Run lint, typecheck, and test-all (CI pipeline)"
 	@echo "  verify-p1    - Run Phase 1 verification gate"
+	@echo "  verify-p2    - Run Phase 2 verification gate"
 	@echo "  clean-data   - Clean local downloaded raw data"
 
 bootstrap:
@@ -51,12 +56,22 @@ lint:
 	$(RUFF) format --check config/ ingest/ retrieval/ agent/ api/ evals/ scripts/ tests/
 
 typecheck:
-	PYTHONPATH=. $(MYPY) config/ ingest/ scripts/
+	PYTHONPATH=. $(MYPY) config/ ingest/ retrieval/ scripts/
 
 ci: lint typecheck test-all
 
 verify-p1:
 	$(PYTHON) scripts/verify_p1.py
+
+verify-p2:
+	$(PYTHON) scripts/verify_p2.py
+
+process:
+	$(PYTHON) -m ingest.process
+
+parse: process
+links: process
+chunk: process
 
 clean-data:
 	rm -rf data/raw/* data/interim/* data/manifests/*

@@ -4,10 +4,10 @@
   "phases": {
     "1": {
       "status": "complete",
-      "completed_at": "2026-10-21T20:39:14.145094Z",
+      "completed_at": "2026-10-21T20:56:11.894650Z",
       "commit": null,
       "artifacts": {
-        "manifest_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-7/test_generate_corpus_report0/manifest.jsonl",
+        "manifest_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-13/test_generate_corpus_report0/manifest.jsonl",
         "raw_dir": "/Users/datchu/Downloads/Projects/RBI/data/raw/rbi",
         "paths_module": "config.paths"
       },
@@ -22,6 +22,36 @@
           "2024": 1
         },
         "target_met": true
+      },
+      "notes": []
+    },
+    "2": {
+      "status": "complete",
+      "completed_at": "2026-10-21T20:56:11.890051Z",
+      "commit": null,
+      "artifacts": {
+        "documents_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-13/test_run_full_processing_smoke0/documents.parquet",
+        "chunks_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-13/test_run_full_processing_smoke0/chunks.parquet",
+        "links_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-13/test_run_full_processing_smoke0/links.parquet",
+        "chunk_count": 109,
+        "doc_count": 25,
+        "token_stats": {
+          "p50": 433.0,
+          "p95": 475.0,
+          "max": 483
+        },
+        "tokenizer_name": "BAAI/bge-small-en-v1.5",
+        "tokenizer_fallback": true,
+        "chunking_version": "2.0.0",
+        "current_doc_count": 25,
+        "superseded_doc_count": 0,
+        "unresolved_edge_count": 0,
+        "degraded_reasons": []
+      },
+      "counts": {
+        "documents": 25,
+        "chunks": 109,
+        "edges": 0
       },
       "notes": []
     }

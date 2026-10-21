@@ -1,0 +1,77 @@
+# Topic taxonomy for official RBI regulatory documents (at least 25 deterministic topics)
+topics:
+  kyc_aml:
+    name: "KYC / AML / Combating Financing of Terrorism"
+    keywords: ["kyc", "know your customer", "cft", "aml", "anti-money laundering", "c-kyc", "pep", "politically exposed person"]
+  digital_lending:
+    name: "Digital Lending & Fintech"
+    keywords: ["digital lending", "lending service provider", "lsp", "digital lending apps", "dla", "fintech", "fldg", "first loss default guarantee"]
+  payments_settlement:
+    name: "Payment & Settlement Systems"
+    keywords: ["payment system", "upi", "neft", "rtgs", "ppi", "prepaid payment instrument", "payment aggregator", "payment gateway"]
+  fema_forex:
+    name: "FEMA & Foreign Exchange"
+    keywords: ["fema", "foreign exchange", "external commercial borrowing", "ecb", "lrs", "liberalised remittance scheme", "ad bank", "authorised dealer"]
+  priority_sector:
+    name: "Priority Sector Lending (PSL)"
+    keywords: ["priority sector", "psl", "agriculture loan", "msme lending", "weaker sections", "pslc"]
+  capital_adequacy:
+    name: "Capital Adequacy & Basel Norms"
+    keywords: ["crar", "capital adequacy", "tier 1 capital", "tier 2 capital", "basel iii", "risk weighted assets", "rwa"]
+  npas_asset_classification:
+    name: "NPAs & Asset Classification"
+    keywords: ["non-performing asset", "npa", "sma-0", "sma-1", "sma-2", "special mention account", "provisioning", "restructuring", "wilful defaulter"]
+  nbfc_regulation:
+    name: "NBFC Regulations"
+    keywords: ["nbfc", "non-banking financial company", "scale based regulation", "middle layer", "upper layer", "base layer", "core investment company"]
+  interest_rates:
+    name: "Interest Rates & Lending Benchmarks"
+    keywords: ["mclr", "base rate", "repo rate", "external benchmark", "eblr", "penal charges", "penal interest", "apr"]
+  urban_cooperative_banks:
+    name: "Urban Co-operative Banks (UCBs)"
+    keywords: ["ucb", "urban cooperative bank", "tier 1 ucb", "tier 2 ucb", "primary cooperative bank"]
+  cyber_security_it:
+    name: "Cyber Security & IT Governance"
+    keywords: ["cyber security", "soc", "it governance", "cyber resilience", "information security", "ciso", "cloud computing"]
+  customer_protection:
+    name: "Customer Protection & Grievance Redressal"
+    keywords: ["ombudsman", "internal ombudsman", "customer protection", "unauthorised electronic transactions", "grievance redressal"]
+  liquidity_risk:
+    name: "Liquidity Risk & Reserve Requirements"
+    keywords: ["crr", "cash reserve ratio", "slr", "statutory liquidity ratio", "lcr", "liquidity coverage ratio", "nsfr"]
+  credit_cards_debit_cards:
+    name: "Credit Cards & Debit Cards"
+    keywords: ["credit card", "debit card", "card issuance", "billing cycle", "co-branded card", "tokenisation"]
+  financial_inclusion:
+    name: "Financial Inclusion & Development"
+    keywords: ["financial inclusion", "pmjdy", "business correspondent", "bc", "lead bank scheme", "self help group", "shg"]
+  governance_directors:
+    name: "Corporate Governance & Board Norms"
+    keywords: ["board of directors", "audit committee", "independent director", "compensation of whole time directors", "fit and proper"]
+  outsourcing:
+    name: "Outsourcing of Financial Services"
+    keywords: ["outsourcing", "material outsourcing", "service provider", "third-party risk", "sub-contracting"]
+  statutory_reporting:
+    name: "Statutory Returns & Regulatory Reporting"
+    keywords: ["regulatory reporting", "cims", "return", "offsite monitoring", "form a", "xbrl"]
+  deposit_insurance:
+    name: "Deposits & Deposit Insurance"
+    keywords: ["dicgc", "inoperative account", "unclaimed deposit", "deposit insurance", "deaf"]
+  audit_inspection:
+    name: "Audit, Inspection & Compliance"
+    keywords: ["risk based internal audit", "rbia", "statutory audit", "supervisory evaluation", "camels", "compliance function"]
+  microfinance:
+    name: "Microfinance Loans"
+    keywords: ["microfinance", "qualifying asset", "household income", "collateral-free loan"]
+  housing_finance:
+    name: "Housing Finance"
+    keywords: ["housing finance", "hfc", "ltv", "loan to value ratio", "individual housing loan"]
+  factoring_trade:
+    name: "Factoring & Trade Financing"
+    keywords: ["factoring", "treds", "trade receivables", "factoring regulation"]
+  climate_risk_esg:
+    name: "Climate Risk & Sustainable Finance"
+    keywords: ["climate risk", "green deposit", "sustainable finance", "esg", "green bonds"]
+  securitisation:
+    name: "Securitisation & Transfer of Loan Exposures"
+    keywords: ["securitisation", "transfer of loan exposures", "pass through certificates", "mrr", "minimum retention requirement"]

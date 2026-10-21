@@ -1,0 +1,59 @@
+# Configuration for supersession and reference relation classification
+relations:
+  supersedes:
+    triggers:
+      - "supersede"
+      - "supersedes"
+      - "superseded"
+      - "in supersession of"
+      - "stands superseded"
+      - "has been superseded"
+      - "this master direction has been superseded"
+      - "replaces"
+    negations:
+      - "no circular has been superseded"
+      - "not superseded"
+      - "without superseding"
+
+  withdraws:
+    triggers:
+      - "stands withdrawn"
+      - "will stand withdrawn"
+      - "withdrawn"
+      - "repealed"
+      - "rescinded"
+      - "cancelled"
+      - "master circulars issued on various subjects will stand withdrawn"
+    negations:
+      - "not withdrawn"
+      - "will not stand withdrawn"
+
+  amends:
+    triggers:
+      - "amend"
+      - "amends"
+      - "amended"
+      - "amendment to"
+      - "amendments to"
+      - "modification to"
+      - "modifies"
+      - "read as"
+    negations:
+      - "not amended"
+      - "without amendment"
+
+  refers:
+    triggers:
+      - "refer to"
+      - "reference is invited to"
+      - "in terms of"
+      - "in continuation of"
+      - "vide"
+      - "pursuant to"
+      - "in accordance with"
+    negations: []
+
+  updates:
+    triggers:
+      - "updated as on"
+    negations: []

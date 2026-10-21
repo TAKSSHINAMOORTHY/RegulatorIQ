@@ -75,12 +75,12 @@ def canonicalise_url(url: str) -> str:
         parsed = urlparse(url)
         scheme = parsed.scheme.lower() or "https"
         netloc = parsed.netloc.lower()
-        path = parsed.path or "/"
+        path = parsed.path.strip() or "/"
         if path.endswith("/") and len(path) > 1:
             path = path[:-1]
 
         # Query parsing: preserve query but discard fragment
-        query = parsed.query
+        query = parsed.query.strip()
         return urlunparse((scheme, netloc, path, "", query, ""))
     except Exception:
         return url.strip()
