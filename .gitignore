@@ -1,0 +1,64 @@
+# Prompts folder - DO NOT PUSH
+prompts/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Data and Artifacts (large binaries, local cache)
+data/raw/
+data/interim/
+data/runtime/
+artifacts/index/
+artifacts/embed_cache/
+artifacts/rerank_cache/
+artifacts/llm_cache/
+artifacts/dist/
+
+# Logs & temp
+reports/logs/
+*.log
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# Node / Frontend
+node_modules/
+.next/
+web/out/
+web/.next/
+web/node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+.env.local
+.env.*.local
