@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "regulatoriq"
+version = "0.1.0"
+description = "Agentic RAG over Official Reserve Bank of India (RBI) Regulations"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "RegulatorIQ Contributors" }]
+dependencies = [
+    "httpx[http2]>=0.27.0",
+    "tenacity>=8.2.0",
+    "selectolax>=0.3.21",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.1.0",
+    "feedparser>=6.0.10",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "typer>=0.12.0",
+    "rich>=13.7.0",
+    "pandas>=2.2.0",
+    "pyarrow>=15.0.0",
+    "python-dateutil>=2.9.0",
+    "tqdm>=4.66.0",
+    "orjson>=3.9.15",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.23.0",
+    "respx>=0.21.0",
+    "hypothesis>=6.98.0",
+    "ruff>=0.3.0",
+    "mypy>=1.9.0",
+    "pre-commit>=3.6.0",
+    "types-python-dateutil>=2.9.0",
+    "pandas-stubs>=2.2.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["config*", "ingest*", "retrieval*", "agent*", "api*", "evals*", "scripts*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "unit: Fast unit tests",
+    "integration: Integration tests without network",
+    "live: Live tests against real RBI endpoints (network required)",
+    "data: Tests requiring processed data files",
+]

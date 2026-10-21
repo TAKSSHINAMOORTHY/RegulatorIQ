@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-21T20:37:53.339483Z",
+  "total_manifest_rows": 25,
+  "successful_documents": 25,
+  "target_met": false,
+  "total_bytes": 3043931,
+  "total_megabytes": 2.9,
+  "counts_by_type": {
+    "Press Release": 10,
+    "Notification": 10,
+    "Speech": 5
+  },
+  "counts_by_year": {
+    "2026": 25
+  },
+  "failures_by_reason": {},
+  "degraded_reasons": [
+    "Corpus size (25 documents) below target of 10000; continuing with authentic RBI docs only"
+  ]
+}

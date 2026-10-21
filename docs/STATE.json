@@ -1,0 +1,29 @@
+{
+  "project": "RegulatorIQ",
+  "version": "0.1.0",
+  "phases": {
+    "1": {
+      "status": "complete",
+      "completed_at": "2026-10-21T20:39:14.145094Z",
+      "commit": null,
+      "artifacts": {
+        "manifest_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-7/test_generate_corpus_report0/manifest.jsonl",
+        "raw_dir": "/Users/datchu/Downloads/Projects/RBI/data/raw/rbi",
+        "paths_module": "config.paths"
+      },
+      "counts": {
+        "total_documents": 42,
+        "counts_by_type": {
+          "Master Direction": 1,
+          "Circular": 1
+        },
+        "counts_by_year": {
+          "2025": 1,
+          "2024": 1
+        },
+        "target_met": true
+      },
+      "notes": []
+    }
+  }
+}
