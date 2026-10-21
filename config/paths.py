@@ -58,7 +58,9 @@ LINK_ANOMALIES_MD = REPORTS_DIR / "link_anomalies.md"
 
 # Index and Cache artifacts
 INDEX_BASE_DIR = ARTIFACTS_DIR / "index"
+INDEX_DIR = INDEX_BASE_DIR
 EMBED_CACHE_DIR = ARTIFACTS_DIR / "embed_cache"
+INDEX_POINTER = INDEX_DIR / "CURRENT"
 RERANK_CACHE_DIR = ARTIFACTS_DIR / "rerank_cache"
 LLM_CACHE_DIR = ARTIFACTS_DIR / "llm_cache"
 DIST_DIR = ARTIFACTS_DIR / "dist"
@@ -70,6 +72,8 @@ LEGAL_DOCS_DIR = DOCS_DIR / "legal"
 LOGS_DIR = REPORTS_DIR / "logs"
 CORPUS_REPORT_MD = REPORTS_DIR / "corpus_report.md"
 CORPUS_REPORT_JSON = REPORTS_DIR / "corpus_report.json"
+INDEX_REPORT_MD = REPORTS_DIR / "index_report.md"
+INDEX_REPORT_JSON = REPORTS_DIR / "index_report.json"
 
 # Auto-create essential directories on import
 for directory in (

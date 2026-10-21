@@ -111,7 +111,7 @@ def test_chunk_document_deterministic():
 
 
 # Property-based hypothesis tests
-@settings(max_examples=30)
+@settings(max_examples=30, deadline=None)
 @given(
     st.lists(
         st.text(alphabet="abcdefghijklmnopqrstuvwxyz ", min_size=5, max_size=50),

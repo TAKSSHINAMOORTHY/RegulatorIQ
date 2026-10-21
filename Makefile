@@ -73,5 +73,22 @@ parse: process
 links: process
 chunk: process
 
+embed: index
+
+index:
+	$(PYTHON) -m retrieval.build_index
+
+index-verify:
+	$(PYTHON) -c "from retrieval.index_store import IndexStore; IndexStore.load(verify='full'); print('Index verified successfully!')"
+
+index-package:
+	$(PYTHON) -c "from retrieval.build_index import package_index; package_index()"
+
+index-publish:
+	$(PYTHON) -c "from retrieval.build_index import package_index; package_index()"
+
+verify-p3:
+	$(PYTHON) scripts/verify_p3.py
+
 clean-data:
 	rm -rf data/raw/* data/interim/* data/manifests/*

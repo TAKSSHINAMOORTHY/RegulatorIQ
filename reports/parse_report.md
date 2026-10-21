@@ -1,18 +1,18 @@
 # 📑 RegulatorIQ Document Parsing, Linking & Chunking Report
 
-**Generated At:** 2026-10-21T20:54:08.787275Z
+**Generated At:** 2026-10-21T21:02:40.075835Z
 **Total Documents Processed:** 25
-**Total Chunks Generated:** 109
+**Total Chunks Generated:** 111
 **Parsed Ratio:** 100.0%
 **Quarantined Documents:** 0
 
 ---
 
 ## 📊 Chunking & Token Statistics
-- **Tokenizer:** `BAAI/bge-small-en-v1.5` (Fallback: `True`)
-- **Median Tokens (p50):** 433.0
-- **95th Percentile Tokens (p95):** 475.0
-- **Maximum Tokens:** 483 (Hard Limit: 512 ✅)
+- **Tokenizer:** `BAAI/bge-small-en-v1.5` (Fallback: `False`)
+- **Median Tokens (p50):** 420.0
+- **95th Percentile Tokens (p95):** 487.0
+- **Maximum Tokens:** 505 (Hard Limit: 512 ✅)
 
 ---
 

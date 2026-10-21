@@ -56,6 +56,30 @@ class Settings(BaseSettings):
         default=1024 * 1024 * 1024,  # 1 GB
         description="Max byte size for local index artifact",
     )
+    VECTOR_BACKEND: str = Field(
+        default="faiss",
+        description="Vector backend: faiss | qdrant | numpy",
+    )
+    VECTOR_QUANT: str = Field(
+        default="fp16",
+        description="Vector quantisation: none | fp16 | int8",
+    )
+    BM25_K1: float = Field(
+        default=1.2,
+        description="BM25 k1 term frequency saturation parameter",
+    )
+    BM25_B: float = Field(
+        default=0.75,
+        description="BM25 b length penalty parameter",
+    )
+    HF_TOKEN: Optional[str] = Field(
+        default=None,
+        description="Hugging Face API token for publishing",
+    )
+    GITHUB_TOKEN: Optional[str] = Field(
+        default=None,
+        description="GitHub token for publishing releases",
+    )
 
     # Logging and Tracing
     LOG_LEVEL: str = Field(default="INFO", description="Log level")

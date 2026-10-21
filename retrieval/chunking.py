@@ -13,7 +13,7 @@ from ingest.manifest import ManifestRecord
 from ingest.parse.models import ParsedDocument
 from ingest.structure import SectionNode
 
-CHUNKING_VERSION = "2.0.0"
+CHUNKING_VERSION = "2.1.0"
 
 # Sentence boundary regex that protects abbreviations, decimals, and dates
 RE_SENTENCE_SPLIT = re.compile(
@@ -22,25 +22,37 @@ RE_SENTENCE_SPLIT = re.compile(
 
 
 class TokenCounter:
-    """Token counter using HuggingFace tokenizer or safe approx fallback."""
+    """Token counter using tokenizers/transformers or safe approx fallback."""
 
     def __init__(self, model_name: str = "BAAI/bge-small-en-v1.5"):
         self.model_name = model_name
         self.tokenizer = None
         self.is_fallback = False
+        self._mode = "fallback"
         try:
-            from transformers import AutoTokenizer  # type: ignore
+            from tokenizers import Tokenizer  # type: ignore
 
-            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+            self.tokenizer = Tokenizer.from_pretrained(model_name)
+            self._mode = "tokenizers"
         except Exception:
-            self.is_fallback = True
+            try:
+                from transformers import AutoTokenizer  # type: ignore
+
+                self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+                self._mode = "transformers"
+            except Exception:
+                self.is_fallback = True
+                self._mode = "fallback"
 
     def count(self, text: str) -> int:
         if not text:
             return 0
         if self.tokenizer and not self.is_fallback:
             try:
-                return len(self.tokenizer.encode(text, add_special_tokens=False))
+                if self._mode == "tokenizers":
+                    return len(self.tokenizer.encode(text).ids)
+                elif self._mode == "transformers":
+                    return len(self.tokenizer.encode(text, add_special_tokens=False))
             except Exception:
                 pass
         # Fallback: ceil(words * 1.3)
@@ -183,6 +195,11 @@ def chunk_section(
                 else:
                     break
 
+            # If overlap + sent exceeds max_tokens, drop oldest overlap sentences
+            while overlap_sentences and (overlap_count + sent_tokens > max_tokens):
+                popped = overlap_sentences.pop(0)
+                overlap_count -= token_counter.count(popped)
+
             current_sentences = overlap_sentences + [sent]
             current_tokens = overlap_count + sent_tokens
         else:
@@ -194,8 +211,10 @@ def chunk_section(
         # If last chunk is very small and previous chunk exists, merge if under max_tokens
         if chunks and current_tokens < min_tokens:
             prev_str, prev_tok, prev_cursor = chunks[-1]
-            if prev_tok + current_tokens <= max_tokens:
-                chunks[-1] = (f"{prev_str} {chunk_str}", prev_tok + current_tokens, prev_cursor)
+            merged_candidate = f"{prev_str} {chunk_str}"
+            merged_count = token_counter.count(merged_candidate)
+            if merged_count <= max_tokens:
+                chunks[-1] = (merged_candidate, merged_count, prev_cursor)
             else:
                 chunks.append((chunk_str, current_tokens, char_cursor))
         else:
@@ -283,9 +302,10 @@ def chunk_document(
             tok_count = token_counter.count(embedding_text)
 
             # Hard cap guarantee <= 512
-            if tok_count > 512:
+            while tok_count > 512 and len(tbl_text.split()) > 5:
                 words = tbl_text.split()
-                tbl_text = " ".join(words[:320])
+                trim_len = max(5, int(len(words) * 0.85))
+                tbl_text = " ".join(words[:trim_len])
                 embedding_text = f"{header}\n\n{tbl_text}"
                 tok_count = token_counter.count(embedding_text)
 
@@ -327,7 +347,7 @@ def chunk_document(
 
     # 2. Chunk text sections
     for sec in sections:
-        section_pieces = chunk_section(sec, token_counter, target_tokens=360, max_tokens=440)
+        section_pieces = chunk_section(sec, token_counter, target_tokens=340, max_tokens=420)
         for piece_text, _, char_offset in section_pieces:
             ordinal += 1
             header = build_contextual_header(
@@ -341,9 +361,10 @@ def chunk_document(
             tok_count = token_counter.count(embedding_text)
 
             # Hard cap guarantee <= 512
-            if tok_count > 512:
+            while tok_count > 512 and len(piece_text.split()) > 5:
                 words = piece_text.split()
-                piece_text = " ".join(words[:320])
+                trim_len = max(5, int(len(words) * 0.85))
+                piece_text = " ".join(words[:trim_len])
                 embedding_text = f"{header}\n\n{piece_text}"
                 tok_count = token_counter.count(embedding_text)
 

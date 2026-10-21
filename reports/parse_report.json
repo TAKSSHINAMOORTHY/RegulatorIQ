@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-21T20:54:08.787275Z",
+  "generated_at": "2026-10-21T21:02:40.075835Z",
   "doc_count": 25,
-  "chunk_count": 109,
+  "chunk_count": 111,
   "parsed_ratio": 1.0,
   "quarantined_count": 0,
   "current_doc_count": 25,
@@ -9,12 +9,12 @@
   "edges_count": 0,
   "unresolved_edges_count": 0,
   "token_stats": {
-    "p50": 433.0,
-    "p95": 475.0,
-    "max": 483
+    "p50": 420.0,
+    "p95": 487.0,
+    "max": 505
   },
   "tokenizer_name": "BAAI/bge-small-en-v1.5",
-  "tokenizer_fallback": true,
-  "chunking_version": "2.0.0",
+  "tokenizer_fallback": false,
+  "chunking_version": "2.1.0",
   "degraded_reasons": []
 }
