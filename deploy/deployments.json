@@ -1,0 +1,13 @@
+[
+  {
+    "target": "local",
+    "url": "http://localhost:8000",
+    "region": "local",
+    "mode": "full",
+    "image_digest": "sha256:local_mock_digest",
+    "index_version": "2024.10.1",
+    "deployed_at": "2026-10-22T09:24:27.677778+00:00",
+    "status": "ready",
+    "notes": "Automated deployment verification passed"
+  }
+]

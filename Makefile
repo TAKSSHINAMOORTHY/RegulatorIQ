@@ -180,6 +180,36 @@ web-assets:
 verify-p8:
 	$(PYTHON) scripts/verify_p8.py
 
+deploy:
+	$(PYTHON) scripts/deploy.py --targets $(or $(TARGETS),auto)
+
+deploy-dry:
+	$(PYTHON) scripts/deploy.py --targets $(or $(TARGETS),auto)
+
+deploy-apply:
+	$(PYTHON) scripts/deploy.py --apply --targets $(or $(TARGETS),auto)
+
+deploy-resume:
+	$(PYTHON) scripts/deploy.py --apply --targets $(or $(TARGETS),auto)
+
+warmup-test:
+	$(PYTHON) scripts/warmup.py --force
+
+coldstart:
+	$(PYTHON) scripts/measure_coldstart.py
+
+cost-guard:
+	$(PYTHON) scripts/cost_guard.py
+
+smoke:
+	$(PYTHON) scripts/smoke.py
+
+release-gate:
+	$(PYTHON) evals/gate.py --system $(or $(SYSTEM),agent_full) --split test
+
+verify-p9:
+	$(PYTHON) scripts/verify_p9.py
+
 clean-data:
 	rm -rf data/raw/* data/interim/* data/manifests/*
 

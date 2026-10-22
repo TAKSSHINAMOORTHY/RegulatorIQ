@@ -1,0 +1,55 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - api
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  api:
+    image: ${IMAGE_NAME:-ghcr.io/taksshinamoorthy/regulatoriq/api:latest}
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=256M,mode=1777
+      - /app/cache:size=512M,mode=1777
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2048M
+        reservations:
+          memory: 512M
+    environment:
+      - PORT=7860
+      - ENVIRONMENT=production
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-https://${DOMAIN:-localhost}}
+      - WARMUP_TOKEN=${WARMUP_TOKEN}
+      - INDEX_URL=${INDEX_URL}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/health"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+volumes:
+  caddy_data:
+  caddy_config:

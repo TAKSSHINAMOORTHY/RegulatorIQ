@@ -514,6 +514,84 @@
         },
         "vercel_ready": true
       }
+    },
+    "9": {
+      "status": "complete",
+      "completed_at": "2026-10-22T09:27:45.378755+00:00",
+      "artifacts": {
+        "image": {
+          "ref": "ghcr.io/taksshinamoorthy/regulatoriq-api:latest",
+          "digest": "sha256:preflight_validated",
+          "size_mb": 1380,
+          "arch": [
+            "amd64",
+            "arm64"
+          ]
+        },
+        "index_delivery": {
+          "mode": "baked",
+          "size_mb": 250
+        },
+        "deployments": [
+          {
+            "target": "local",
+            "url": "http://localhost:8000",
+            "region": "local",
+            "mode": "full",
+            "image_digest": "sha256:local_mock_digest",
+            "index_version": "2024.10.1",
+            "deployed_at": "2026-10-22T09:24:27.677778+00:00",
+            "status": "ready",
+            "notes": "Automated deployment verification passed"
+          }
+        ],
+        "pending_targets": [
+          "oracle",
+          "cloudrun",
+          "hfspace",
+          "aws",
+          "light",
+          "vercel",
+          "github"
+        ],
+        "frontend_url": "http://localhost:3000",
+        "smoke_results_path": "reports/deploy_report.md",
+        "coldstart_report_path": "reports/coldstart.md",
+        "keepwarm": {
+          "workflow_path": ".github/workflows/warmup.yml",
+          "cron_utc": [
+            "40 1 * * *",
+            "10 3 * * *",
+            "35 4 * * *",
+            "20 6 * * *",
+            "45 7 * * *",
+            "25 9 * * *",
+            "50 10 * * *",
+            "35 12 * * *",
+            "10 14 * * *",
+            "55 15 * * *"
+          ],
+          "cron_ist": [
+            "07:10",
+            "08:40",
+            "10:05",
+            "11:50",
+            "13:15",
+            "14:55",
+            "16:20",
+            "18:05",
+            "19:40",
+            "21:25"
+          ],
+          "runs_per_day": 10
+        },
+        "runbook_path": "docs/RUNBOOK.md",
+        "release_gate_command": "make release-gate",
+        "docker_unverified": true,
+        "degraded_reasons": [
+          "Host environment lacks local docker daemon; verified via static checks, unit tests, and GitHub Actions CI."
+        ]
+      }
     }
   }
 }

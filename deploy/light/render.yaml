@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: regulatoriq-api-light
+    env: docker
+    plan: free
+    dockerfilePath: docker/Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: RAG_LIGHT_MODE
+        value: "1"
+      - key: ENVIRONMENT
+        value: production
+      - key: WARMUP_TOKEN
+        sync: false
