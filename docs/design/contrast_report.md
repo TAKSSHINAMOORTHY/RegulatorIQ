@@ -1,6 +1,6 @@
 # Ledger Aurora Contrast & Accessibility Report (WCAG 2.2 AA)
 
-**Date:** 2026-10-22T09:49:02.384Z
+**Date:** 2026-10-22T09:50:46.991Z
 **Status:** PASSED (All pairs meet WCAG AA requirements)
 
 This report verifies contrast ratios for all text, UI element, and glass surface token pairs in both light ('Paper & Saffron') and dark ('Midnight Ink') themes. Body text requires >= 4.5:1; UI components and large text require >= 3.0:1.

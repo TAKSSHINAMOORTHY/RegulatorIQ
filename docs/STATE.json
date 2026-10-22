@@ -450,7 +450,7 @@
     },
     "7": {
       "status": "completed",
-      "completed_at": "2026-10-22T09:49:01Z",
+      "completed_at": "2026-10-22T09:50:46Z",
       "artifacts": {
         "api_entrypoint": "api.main:app",
         "openapi_path": "docs/openapi.json",
@@ -517,7 +517,7 @@
     },
     "9": {
       "status": "complete",
-      "completed_at": "2026-10-22T09:49:09.045584+00:00",
+      "completed_at": "2026-10-22T09:50:53.740772+00:00",
       "artifacts": {
         "image": {
           "ref": "ghcr.io/taksshinamoorthy/regulatoriq-api:latest",
@@ -595,7 +595,7 @@
     },
     "10": {
       "status": "complete",
-      "completed_at": "2026-10-22T09:49:11.077464+00:00",
+      "completed_at": "2026-10-22T09:50:55.542445+00:00",
       "artifacts": {
         "final_report_path": "reports/FINAL_REPORT.md",
         "all_phases_verified": true,
