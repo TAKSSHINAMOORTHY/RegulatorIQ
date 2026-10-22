@@ -210,6 +210,9 @@ release-gate:
 verify-p9:
 	$(PYTHON) scripts/verify_p9.py
 
+verify-p10:
+	$(PYTHON) scripts/verify_p10.py
+
 clean-data:
 	rm -rf data/raw/* data/interim/* data/manifests/*
 

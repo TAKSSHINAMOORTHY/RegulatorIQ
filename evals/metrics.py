@@ -12,7 +12,7 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 import yaml
@@ -285,8 +285,8 @@ def compute_faithfulness(
 
 
 def compute_citation_metrics(
-    cited_chunk_ids: List[Optional[str]],
-    gold_chunk_ids: List[str],
+    cited_chunk_ids: Sequence[Optional[str]],
+    gold_chunk_ids: Sequence[str],
 ) -> Tuple[float, float]:
     """Compute citation_precision and citation_recall against gold chunk ids.
 

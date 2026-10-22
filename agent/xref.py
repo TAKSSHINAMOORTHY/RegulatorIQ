@@ -8,9 +8,8 @@ Enables multi-hop evidence collection:
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, List, Optional, Set
 
 from retrieval.hybrid import RankedChunk
 
@@ -65,7 +64,9 @@ class XRefTraverser:
                 if docs_explored >= self.max_docs:
                     break
 
-                target_doc = getattr(link, "target_doc_id", None) or getattr(link, "tgt_doc_id", None)
+                target_doc = getattr(link, "target_doc_id", None) or getattr(
+                    link, "tgt_doc_id", None
+                )
                 rel = getattr(link, "rel_type", "refers_to") or "refers_to"
 
                 if not target_doc or target_doc in visited_docs:
@@ -105,7 +106,8 @@ class XRefTraverser:
                         src_doc_id=doc_id,
                         target_doc_id=target_doc,
                         relation=rel,
-                        reference_text=getattr(link, "context_text", "") or f"Reference from {doc_id} to {target_doc}",
+                        reference_text=getattr(link, "context_text", "")
+                        or f"Reference from {doc_id} to {target_doc}",
                         path=[doc_id, target_doc],
                         retrieved_chunks=matched_rcs,
                     )

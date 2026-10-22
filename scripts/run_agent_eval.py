@@ -20,14 +20,11 @@ Produces:
 
 from __future__ import annotations
 
-import argparse
-import copy
 import hashlib
 import json
 import time
 from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import yaml
@@ -38,8 +35,6 @@ from config.paths import (
     CLAIMS_MD,
     CONFIG_DIR,
     EVAL_SET_PATH,
-    REPORTS_DIR,
-    RUNS_DIR,
 )
 from evals.metrics import (
     bootstrap_ci,
@@ -52,7 +47,6 @@ from evals.metrics import (
 )
 from evals.systems import get_system
 from evals.test_guard import check_and_log_test_touch
-from retrieval.index_store import IndexStore
 
 
 def load_questions_by_split() -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
@@ -100,7 +94,7 @@ def evaluate_system_split(
     if split_name == "test":
         run_id = f"run_p6_{sys_name}_{int(time.time())}"
         config_hash = hashlib.sha256(sys_name.encode()).hexdigest()[:16]
-        force = (sys_name == "rag_best")
+        force = sys_name == "rag_best"
         force_reason = "Phase 6 baseline reference" if force else ""
         try:
             check_and_log_test_touch(
@@ -176,13 +170,17 @@ def evaluate_system_split(
         # Question-type specific metrics
         if q_type == "temporal":
             # Correct if retrieved current chunk or properly handled validity
-            has_current = any(c.get("status") == "current" for c in ans.retrieved) or not ans.refused
+            has_current = (
+                any(c.get("status") == "current" for c in ans.retrieved) or not ans.refused
+            )
             temporal_accs.append(1.0 if has_current else 0.0)
             if not has_current:
                 failure_buckets["temporal_error"] += 1
 
         if q_type == "multi_hop":
-            all_found = compute_all_gold_found(retrieved_ids, gold_chunks)
+            all_found = compute_all_gold_found(
+                retrieved_ids, gold_chunks, k=len(retrieved_ids) or 5
+            )
             multi_hop_golds.append(all_found)
             if all_found < 1.0:
                 failure_buckets["retrieval_miss"] += 1
@@ -190,11 +188,18 @@ def evaluate_system_split(
         if not ans.refused and ans.answer:
             f, _ = compute_faithfulness(ans.answer, [c.get("text", "") for c in ans.retrieved])
             faiths.append(f)
-            keys = q.get("answer_keys") or ([gold_answer] if isinstance(gold_answer, str) else gold_answer)
+            keys = q.get("answer_keys") or (
+                [gold_answer] if isinstance(gold_answer, str) else gold_answer
+            )
             c = compute_answer_correctness(ans.answer, keys)
             corrs.append(c)
-            cited_ids = [cit.get("chunk_id") if isinstance(cit, dict) else str(cit) for cit in ans.citations]
-            gold_ids = [g.get("chunk_id") if isinstance(g, dict) else str(g) for g in gold_chunks]
+            cited_ids: List[str] = [
+                str(cit.get("chunk_id")) if isinstance(cit, dict) else str(cit)
+                for cit in ans.citations
+            ]
+            gold_ids: List[str] = [
+                str(g.get("chunk_id")) if isinstance(g, dict) else str(g) for g in gold_chunks
+            ]
             p, _ = compute_citation_metrics(cited_ids, gold_ids)
             precisions.append(p)
             if p < 0.5:
@@ -204,13 +209,15 @@ def evaluate_system_split(
             corrs.append(1.0 if ans.refused and not is_answerable else 0.0)
             precisions.append(1.0 if ans.refused and not is_answerable else 0.0)
 
-        overall = compute_overall_score({
-            "faithfulness": faiths[-1],
-            "answer_correctness": corrs[-1],
-            "recall_at_5": recalls[-1],
-            "citation_precision": precisions[-1],
-            "refusal_accuracy": ref_accs[-1] if not is_answerable else 1.0,
-        })
+        overall = compute_overall_score(
+            {
+                "faithfulness": faiths[-1],
+                "answer_correctness": corrs[-1],
+                "recall_at_5": recalls[-1],
+                "citation_precision": precisions[-1],
+                "refusal_accuracy": ref_accs[-1] if not is_answerable else 1.0,
+            }
+        )
         scores.append(overall)
 
     ms_score = bootstrap_ci(scores)
@@ -294,13 +301,15 @@ def generate_agent_report_md(
             f"{res['latency_p95_ms']:.1f}ms | {res['llm_calls_avg']:.1f} |"
         )
 
-    lines.extend([
-        "",
-        "## 3. Paired Bootstrap Statistical Comparison vs rag_best",
-        "",
-        "| System | Delta Mean vs rag_best | 95% CI | Two-sided p-value | Statistically Significant ($p < 0.05$)? |",
-        "| :--- | :---: | :---: | :---: | :---: |",
-    ])
+    lines.extend(
+        [
+            "",
+            "## 3. Paired Bootstrap Statistical Comparison vs rag_best",
+            "",
+            "| System | Delta Mean vs rag_best | 95% CI | Two-sided p-value | Statistically Significant ($p < 0.05$)? |",
+            "| :--- | :---: | :---: | :---: | :---: |",
+        ]
+    )
 
     for sys_name, delta_info in deltas_vs_rag_best.items():
         sig_str = "✅ Yes" if delta_info["significant"] else "❌ No"
@@ -309,13 +318,15 @@ def generate_agent_report_md(
             f"{delta_info['p_value']:.4f} | {sig_str} |"
         )
 
-    lines.extend([
-        "",
-        "## 4. Test Split Benchmark Verification (40 Questions, 1 Touch Guarded)",
-        "",
-        "| System | Overall Score | Rec@5 | Temporal Acc | Multi-Hop Found | False Refusal | P95 Latency |",
-        "| :--- | :---: | :---: | :---: | :---: | :---: | :---: |",
-    ])
+    lines.extend(
+        [
+            "",
+            "## 4. Test Split Benchmark Verification (40 Questions, 1 Touch Guarded)",
+            "",
+            "| System | Overall Score | Rec@5 | Temporal Acc | Multi-Hop Found | False Refusal | P95 Latency |",
+            "| :--- | :---: | :---: | :---: | :---: | :---: | :---: |",
+        ]
+    )
 
     for res in test_results:
         lines.append(
@@ -324,46 +335,48 @@ def generate_agent_report_md(
             f"{res['false_refusal_rate']:.2f} | {res['latency_p95_ms']:.1f}ms |"
         )
 
-    lines.extend([
-        "",
-        "## 5. Cost-Benefit Trade-Offs by Capability",
-        "",
-        "| Capability Node | Metric Gain | Latency Cost | Token / Call Cost | Verdict |",
-        "| :--- | :--- | :--- | :--- | :--- |",
-        "| **Safety Guard** | -100% PII leak, 0 injection execution | +0.02ms | 0 LLM calls (deterministic) | **Essential** |",
-        "| **Router** | 0 cost on chitchat, protects regulatory intent | +0.20ms | 0-1 calls | **Essential** |",
-        "| **Decompose** | +18% multi-hop all-gold-found | +0.05ms | 0 calls in rules mode | **Essential** |",
-        "| **Validity Resolver** | +45% temporal accuracy | +0.10ms | 0 calls (graph traversal) | **High Impact** |",
-        "| **XRef Traverser** | +12% multi-doc coverage | +0.15ms | 0 calls (store lookup) | **High Impact** |",
-        "| **SelfChecker** | 0 ungrounded numbers, hard citation audit | +0.50ms | 0 calls (lexical audit) | **Essential** |",
-        "",
-        "### Capabilities that did NOT help significantly",
-        "- **Excessive Grade-Retry (> 2 rounds)**: After round 2, repeated query reformulation yields diminishing returns while eating graph step budget.",
-        "- **Deep XRef Hops (> 2 hops)**: Traversal beyond 2 hops increases off-topic drift without improving top-5 precision.",
-        "",
-        "## 6. Failure Mode Transition Analysis",
-        "",
-        "| Failure Bucket | rag_best | agent_rules | agent_full | Root Cause & Resolution |",
-        "| :--- | :---: | :---: | :---: | :--- |",
-        "| `retrieval_miss` | 7 | 4 | 3 | Query decomposition resolves conjunct queries into separate retrieval rounds. |",
-        "| `over_refusal` | 2 | 2 | 1 | Calibrated threshold (0.15) prevents false refusals on valid queries. |",
-        "| `under_refusal` | 3 | 1 | 0 | RefusalPolicy checks centroid scope and borderline evidence counts. |",
-        "| `temporal_error` | 6 | 1 | 0 | ValidityResolver follows supersession graph to latest Master Direction. |",
-        "| `citation_error` | 5 | 1 | 0 | SelfChecker redacts uncited claims and strips invalid citation brackets. |",
-        "",
-        "## 7. Annotated Execution Traces (10 Exemplar Scenarios)",
-        "",
-        "1. **Exact Lookup**: Direct intent route -> single retrieve -> grade relevant -> validity current -> grounded answer with [1].",
-        "2. **Adaptive Retry**: Initial lookup misses -> grade partial -> rewrite with synonym expansion -> second retrieval succeeds.",
-        "3. **Superseded Validity Resolution**: User queries historical Master Circular -> resolver detects `superseded_by` -> replaces with current Master Direction.",
-        "4. **Cross-Reference Traversal**: Exposure limit query cites Section 42 -> traverser fetches linked parent circular across 2 hops.",
-        "5. **PII Redaction**: User supplies PAN number -> guard redacts with `[REDACTED_PAN]` -> answer generated without echoing PAN.",
-        "6. **Refusal with Official Guidance**: User queries personal investment advice -> guard flags -> polite refusal citing official scope.",
-        "7. **Clarification as Assumption**: Ambiguous entity in batch mode -> runner emits explicit assumption statement: *Assuming Commercial Bank...*",
-        "8. **Multi-Hop Conjunction**: Query asks for CRR and SLR comparison -> decomposes into two sub-questions -> merges evidence.",
-        "9. **Self-Check Regeneration**: Model drafts fabricated percentage -> checker flags failure -> triggers corrective rewrite pass.",
-        "10. **Budget Degradation Guard**: Path hits step threshold -> runner freezes iteration -> outputs `degraded_budget` without hanging.",
-    ])
+    lines.extend(
+        [
+            "",
+            "## 5. Cost-Benefit Trade-Offs by Capability",
+            "",
+            "| Capability Node | Metric Gain | Latency Cost | Token / Call Cost | Verdict |",
+            "| :--- | :--- | :--- | :--- | :--- |",
+            "| **Safety Guard** | -100% PII leak, 0 injection execution | +0.02ms | 0 LLM calls (deterministic) | **Essential** |",
+            "| **Router** | 0 cost on chitchat, protects regulatory intent | +0.20ms | 0-1 calls | **Essential** |",
+            "| **Decompose** | +18% multi-hop all-gold-found | +0.05ms | 0 calls in rules mode | **Essential** |",
+            "| **Validity Resolver** | +45% temporal accuracy | +0.10ms | 0 calls (graph traversal) | **High Impact** |",
+            "| **XRef Traverser** | +12% multi-doc coverage | +0.15ms | 0 calls (store lookup) | **High Impact** |",
+            "| **SelfChecker** | 0 ungrounded numbers, hard citation audit | +0.50ms | 0 calls (lexical audit) | **Essential** |",
+            "",
+            "### Capabilities that did NOT help significantly",
+            "- **Excessive Grade-Retry (> 2 rounds)**: After round 2, repeated query reformulation yields diminishing returns while eating graph step budget.",
+            "- **Deep XRef Hops (> 2 hops)**: Traversal beyond 2 hops increases off-topic drift without improving top-5 precision.",
+            "",
+            "## 6. Failure Mode Transition Analysis",
+            "",
+            "| Failure Bucket | rag_best | agent_rules | agent_full | Root Cause & Resolution |",
+            "| :--- | :---: | :---: | :---: | :--- |",
+            "| `retrieval_miss` | 7 | 4 | 3 | Query decomposition resolves conjunct queries into separate retrieval rounds. |",
+            "| `over_refusal` | 2 | 2 | 1 | Calibrated threshold (0.15) prevents false refusals on valid queries. |",
+            "| `under_refusal` | 3 | 1 | 0 | RefusalPolicy checks centroid scope and borderline evidence counts. |",
+            "| `temporal_error` | 6 | 1 | 0 | ValidityResolver follows supersession graph to latest Master Direction. |",
+            "| `citation_error` | 5 | 1 | 0 | SelfChecker redacts uncited claims and strips invalid citation brackets. |",
+            "",
+            "## 7. Annotated Execution Traces (10 Exemplar Scenarios)",
+            "",
+            "1. **Exact Lookup**: Direct intent route -> single retrieve -> grade relevant -> validity current -> grounded answer with [1].",
+            "2. **Adaptive Retry**: Initial lookup misses -> grade partial -> rewrite with synonym expansion -> second retrieval succeeds.",
+            "3. **Superseded Validity Resolution**: User queries historical Master Circular -> resolver detects `superseded_by` -> replaces with current Master Direction.",
+            "4. **Cross-Reference Traversal**: Exposure limit query cites Section 42 -> traverser fetches linked parent circular across 2 hops.",
+            "5. **PII Redaction**: User supplies PAN number -> guard redacts with `[REDACTED_PAN]` -> answer generated without echoing PAN.",
+            "6. **Refusal with Official Guidance**: User queries personal investment advice -> guard flags -> polite refusal citing official scope.",
+            "7. **Clarification as Assumption**: Ambiguous entity in batch mode -> runner emits explicit assumption statement: *Assuming Commercial Bank...*",
+            "8. **Multi-Hop Conjunction**: Query asks for CRR and SLR comparison -> decomposes into two sub-questions -> merges evidence.",
+            "9. **Self-Check Regeneration**: Model drafts fabricated percentage -> checker flags failure -> triggers corrective rewrite pass.",
+            "10. **Budget Degradation Guard**: Path hits step threshold -> runner freezes iteration -> outputs `degraded_budget` without hanging.",
+        ]
+    )
 
     return "\n".join(lines)
 
@@ -403,7 +416,9 @@ def run_full_agent_evaluation() -> None:
         sys_obj = get_system(name)
         res = evaluate_system_split(name, sys_obj, dev_q, weights, "dev")
         dev_results.append(res)
-        print(f" -> Overall Score: {res['overall_score']:.4f} [CI: {res['overall_score_ci'][0]:.4f}, {res['overall_score_ci'][1]:.4f}]")
+        print(
+            f" -> Overall Score: {res['overall_score']:.4f} [CI: {res['overall_score_ci'][0]:.4f}, {res['overall_score_ci'][1]:.4f}]"
+        )
 
     # Baseline scores for paired bootstrap
     rag_best_scores = next(r["scores_per_sample"] for r in dev_results if r["system"] == "rag_best")
@@ -432,7 +447,9 @@ def run_full_agent_evaluation() -> None:
         sys_obj = get_system(name)
         res = evaluate_system_split(name, sys_obj, test_q, weights, "test")
         test_results.append(res)
-        print(f" -> Overall Score: {res['overall_score']:.4f} [CI: {res['overall_score_ci'][0]:.4f}, {res['overall_score_ci'][1]:.4f}]")
+        print(
+            f" -> Overall Score: {res['overall_score']:.4f} [CI: {res['overall_score_ci'][0]:.4f}, {res['overall_score_ci'][1]:.4f}]"
+        )
 
     # Load agent config metadata
     with open(AGENT_CONFIG, "r", encoding="utf-8") as f:
@@ -443,7 +460,10 @@ def run_full_agent_evaluation() -> None:
         ladder_results_dev=dev_results,
         test_results=test_results,
         deltas_vs_rag_best=deltas_vs_rag_best,
-        runner_metadata={"default_system": agent_cfg.get("default_system", "agent_full"), "degraded_flags": []},
+        runner_metadata={
+            "default_system": agent_cfg.get("default_system", "agent_full"),
+            "degraded_flags": [],
+        },
     )
 
     AGENT_REPORT_MD.parent.mkdir(parents=True, exist_ok=True)
@@ -510,26 +530,30 @@ def update_claims(
 
     # Append Phase 6 agent claims if not already present
     if "## Validated Phase 6 Agent Claims" not in content:
-        agent_full_res = next((r for r in test_results if r["system"] == "agent_full"), test_results[0])
-        agent_rules_res = next((r for r in test_results if r["system"] == "agent_rules"), test_results[0])
+        agent_full_res = next(
+            (r for r in test_results if r["system"] == "agent_full"), test_results[0]
+        )
+        agent_rules_res = next(
+            (r for r in test_results if r["system"] == "agent_rules"), test_results[0]
+        )
 
         new_claims = [
             "",
             "## Validated Phase 6 Agent Claims",
             "",
-            f"1. **Temporal Accuracy on Superseded/Current Regulations**:",
+            "1. **Temporal Accuracy on Superseded/Current Regulations**:",
             f"   - Baseline: **0.5000** -> `agent_rules` (Validity Resolver): **{agent_rules_res['temporal_accuracy']:.4f}**",
-            f"   - Resolves document supersession chains via deterministic graph traversal without an LLM.",
+            "   - Resolves document supersession chains via deterministic graph traversal without an LLM.",
             "",
-            f"2. **Agent Overall Headline Score (40-question Test Split)**:",
+            "2. **Agent Overall Headline Score (40-question Test Split)**:",
             f"   - rag_best: **0.4285** -> `agent_full`: **{agent_full_res['overall_score']:.4f}** [CI: {agent_full_res['overall_score_ci'][0]:.4f}, {agent_full_res['overall_score_ci'][1]:.4f}]",
             "",
-            f"3. **Zero PII Verbatim Echoing & Hallucination Guard**:",
-            f"   - Redacts 100% of PAN, Aadhaar, and credit card numbers.",
-            f"   - SelfChecker enforces deterministic hard checks on dates, figures, and circular identifiers.",
+            "3. **Zero PII Verbatim Echoing & Hallucination Guard**:",
+            "   - Redacts 100% of PAN, Aadhaar, and credit card numbers.",
+            "   - SelfChecker enforces deterministic hard checks on dates, figures, and circular identifiers.",
             "",
-            f"4. **Budget SLA Bounds**:",
-            f"   - P95 Graph Execution Steps: **<= 14**",
+            "4. **Budget SLA Bounds**:",
+            "   - P95 Graph Execution Steps: **<= 14**",
             f"   - P95 Total Agent Wall-Clock Latency: **{agent_full_res['latency_p95_ms']:.1f}ms** (Budget: 25,000ms).",
             "",
         ]

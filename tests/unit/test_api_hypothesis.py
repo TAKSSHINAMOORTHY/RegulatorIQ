@@ -2,13 +2,10 @@
 
 import json
 
-from fastapi.testclient import TestClient
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from api.main import create_app
-from api.security import is_allowed_rbi_url, sanitize_text
-from api.settings import APISettings
+from api.security import sanitize_text
 from api.sse import format_sse_event
 
 
@@ -21,7 +18,10 @@ def test_hypothesis_sanitizer_safety(raw_text):
     assert "sk-" not in sanitized or "[REDACTED" in sanitized
 
 
-@given(st.text(min_size=1, max_size=100), st.dictionaries(st.text(min_size=1, max_size=20), st.text(max_size=50)))
+@given(
+    st.text(min_size=1, max_size=100),
+    st.dictionaries(st.text(min_size=1, max_size=20), st.text(max_size=50)),
+)
 @settings(max_examples=50)
 def test_hypothesis_sse_encoder_roundtrip(event_type, payload):
     frame = format_sse_event(event_type, payload, event_id=1)
@@ -30,7 +30,7 @@ def test_hypothesis_sse_encoder_roundtrip(event_type, payload):
     assert frame.endswith("\n\n")
 
     # Extract data line and assert valid json
-    data_line = [l for l in frame.split("\n") if l.startswith("data: ")][0]
+    data_line = [line_part for line_part in frame.split("\n") if line_part.startswith("data: ")][0]
     json_part = data_line[len("data: ") :]
     parsed = json.loads(json_part)
     assert isinstance(parsed, dict)

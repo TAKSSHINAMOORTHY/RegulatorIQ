@@ -83,7 +83,9 @@ class SelfChecker:
         found_citations = [int(m) for m in re.findall(r"\[(\d+)\]", answer_text)]
         for ref in found_citations:
             if ref < 1 or ref > chunk_count:
-                failures.append(f"Invalid citation [{ref}]: exceeds context item count ({chunk_count})")
+                failures.append(
+                    f"Invalid citation [{ref}]: exceeds context item count ({chunk_count})"
+                )
 
         # Split answer into sentences
         sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", answer_text) if s.strip()]
@@ -155,7 +157,6 @@ class SelfChecker:
             i: getattr(c, "text", str(c)) for i, c in enumerate(context_chunks, start=1)
         }
         all_context_text = " ".join(chunk_texts_by_ref.values())
-        norm_all_context = normalize_text(all_context_text)
 
         for s in sentences:
             refs = [int(m) for m in re.findall(r"\[(\d+)\]", s)]

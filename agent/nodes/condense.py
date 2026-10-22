@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Optional
+from typing import Optional
 
 from agent.llm import LLM, ExtractiveLLMProvider
 from agent.state import AgentState
@@ -42,8 +42,15 @@ def node_condense(
         prev_q = prev_turn.get("question", "") or prev_turn.get("content", "")
 
         # Full mode with generative LLM
-        if state.mode == "full" and llm is not None and not isinstance(llm.provider, ExtractiveLLMProvider):
-            hist_str = "\n".join(f"User: {h.get('question', '')}\nAssistant: {h.get('answer', '')}" for h in state.history[-4:])
+        if (
+            state.mode == "full"
+            and llm is not None
+            and not isinstance(llm.provider, ExtractiveLLMProvider)
+        ):
+            hist_str = "\n".join(
+                f"User: {h.get('question', '')}\nAssistant: {h.get('answer', '')}"
+                for h in state.history[-4:]
+            )
             prompt = prompt_template.replace("{history}", hist_str).replace("{question}", q)
             try:
                 res = llm.generate([{"role": "user", "content": prompt}], max_tokens=100)

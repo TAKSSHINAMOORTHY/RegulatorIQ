@@ -13,7 +13,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import logging
-import os
 import shutil
 import sys
 import tarfile
@@ -57,7 +56,9 @@ def safe_extract_archive(archive_path: Path, dest_dir: Path) -> None:
             for member in tar.getmembers():
                 target = dest_dir / member.name
                 if not is_safe_path(dest_dir, target):
-                    raise RuntimeError(f"Zip-Slip attempt detected for archive entry: {member.name}")
+                    raise RuntimeError(
+                        f"Zip-Slip attempt detected for archive entry: {member.name}"
+                    )
                 if member.issym() or member.islnk():
                     raise RuntimeError(f"Symlinks not permitted in index archive: {member.name}")
             tar.extractall(path=dest_dir)
@@ -67,7 +68,9 @@ def safe_extract_archive(archive_path: Path, dest_dir: Path) -> None:
             for info in zf.infolist():
                 target = dest_dir / info.filename
                 if not is_safe_path(dest_dir, target):
-                    raise RuntimeError(f"Zip-Slip attempt detected for archive entry: {info.filename}")
+                    raise RuntimeError(
+                        f"Zip-Slip attempt detected for archive entry: {info.filename}"
+                    )
             zf.extractall(path=dest_dir)
     else:
         raise ValueError(f"Unsupported archive format: {archive_path}")

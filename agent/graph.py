@@ -7,7 +7,7 @@ guard -> condense -> route -> clarify -> decompose -> retrieve -> grade -> valid
 from __future__ import annotations
 
 import time
-from typing import Any, Callable, Dict, Literal, Optional
+from typing import Any, Dict, Optional
 
 from langgraph.graph import END, START, StateGraph
 
@@ -29,7 +29,7 @@ from agent.nodes.xref import node_xref
 from agent.policy import RefusalPolicy
 from agent.selfcheck import SelfChecker
 from agent.state import AgentState, SubQuestion
-from agent.tracing import Tracer
+from agent.tracing import NoopTracer, Tracer
 from agent.validity import ValidityResolver
 from agent.xref import XRefTraverser
 from retrieval.pipeline import Retriever
@@ -51,7 +51,7 @@ class RegulatoryAgentGraph:
         self.config = config
         self.retriever = retriever
         self.llm = llm
-        self.tracer = tracer or retriever.cache  # fallback
+        self.tracer: Tracer = tracer or NoopTracer()
         self.prompts = prompts or {}
 
         # Budgets and thresholds
@@ -156,7 +156,11 @@ class RegulatoryAgentGraph:
                 return state
             if not self.enable_decompose:
                 state.plan.sub_questions = [
-                    SubQuestion(id="q1", text=state.standalone_question or state.question, combine_strategy="direct")
+                    SubQuestion(
+                        id="q1",
+                        text=state.standalone_question or state.question,
+                        combine_strategy="direct",
+                    )
                 ]
                 return state
             tmpl = self.prompts.get("decompose.v1.txt", "{question}")
@@ -175,7 +179,15 @@ class RegulatoryAgentGraph:
             if not self.enable_grade_retry:
                 return state
             tmpl = self.prompts.get("grade.v1.txt", "{question}")
-            s, _ = node_grade(state, self.llm, self.tracer, tmpl, self.grade_threshold, self.min_relevant, self.max_rounds)
+            s, _ = node_grade(
+                state,
+                self.llm,
+                self.tracer,
+                tmpl,
+                self.grade_threshold,
+                self.min_relevant,
+                self.max_rounds,
+            )
             return s
 
         # 8. Rewrite Retry
@@ -183,7 +195,9 @@ class RegulatoryAgentGraph:
             if self._check_budget(state):
                 return state
             tmpl = self.prompts.get("rewrite.v1.txt", "{question}")
-            return node_rewrite_retry(state, self.analyzer, self.rewriter, self.llm, self.tracer, tmpl)
+            return node_rewrite_retry(
+                state, self.analyzer, self.rewriter, self.llm, self.tracer, tmpl
+            )
 
         # 9. Validity
         def step_validity(state: AgentState) -> AgentState:
@@ -243,7 +257,9 @@ class RegulatoryAgentGraph:
         def route_after_guard(s: AgentState) -> str:
             return "finalize" if s.refused else "condense"
 
-        builder.add_conditional_edges("guard", route_after_guard, {"finalize": "finalize", "condense": "condense"})
+        builder.add_conditional_edges(
+            "guard", route_after_guard, {"finalize": "finalize", "condense": "condense"}
+        )
         builder.add_edge("condense", "route")
 
         def route_after_route(s: AgentState) -> str:
@@ -264,12 +280,16 @@ class RegulatoryAgentGraph:
         def route_after_clarify(s: AgentState) -> str:
             return "finalize" if (s.clarification and s.clarification.needed) else "decompose"
 
-        builder.add_conditional_edges("clarify", route_after_clarify, {"finalize": "finalize", "decompose": "decompose"})
+        builder.add_conditional_edges(
+            "clarify", route_after_clarify, {"finalize": "finalize", "decompose": "decompose"}
+        )
         builder.add_edge("decompose", "retrieve")
         builder.add_edge("retrieve", "grade")
 
         def route_after_grade(s: AgentState) -> str:
-            if (s.budget.steps + 5 >= self.max_steps) or (time.time() - s.budget.started_at >= self.timeout_s):
+            if (s.budget.steps + 5 >= self.max_steps) or (
+                time.time() - s.budget.started_at >= self.timeout_s
+            ):
                 return "validity"
             if not self.enable_grade_retry:
                 return "validity"

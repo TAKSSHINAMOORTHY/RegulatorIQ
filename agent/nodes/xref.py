@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from agent.state import AgentState
 from agent.tracing import Tracer
 from agent.xref import XRefTraverser

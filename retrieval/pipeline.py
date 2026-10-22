@@ -23,7 +23,7 @@ from agent.types import RagAnswer
 from config.paths import PROMPT_RAG_V2_PATH, RETRIEVAL_CONFIG
 from retrieval.context import build_context
 from retrieval.hybrid import HybridConfig, HybridRetriever, RankedChunk
-from retrieval.index_store import Filters, IndexStore
+from retrieval.index_store import IndexStore
 from retrieval.query_analysis import QueryPlan, analyze_query
 from retrieval.rerank import (
     BaseReranker,
@@ -221,7 +221,7 @@ class Retriever:
         self,
         question: str,
         *,
-        filters: Optional[Filters] = None,
+        filters: Optional[Any] = None,
         as_of: Optional[str] = None,
         history: Optional[bool] = None,
         overrides: Optional[Dict[str, Any]] = None,

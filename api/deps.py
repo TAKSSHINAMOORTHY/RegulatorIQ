@@ -12,7 +12,6 @@ from typing import Optional
 from fastapi import Depends, Header, HTTPException, Request, status
 
 from api.budget import GlobalBudgetGuard
-from api.errors import APIError
 from api.feedback_store import FeedbackStore
 from api.ratelimit import RateLimiter
 from api.settings import APISettings, get_settings

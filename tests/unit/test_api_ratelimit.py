@@ -1,6 +1,6 @@
 """Unit tests for Token-Bucket Rate Limiter with Fake Clock."""
 
-from api.ratelimit import DailyTracker, RateLimiter, TokenBucket
+from api.ratelimit import RateLimiter, TokenBucket
 
 
 class FakeClock:

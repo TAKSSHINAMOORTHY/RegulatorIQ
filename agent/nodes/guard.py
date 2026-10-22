@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
-
 from agent.guards import SafetyGuard
 from agent.policy import RefusalPolicy
 from agent.state import AgentState

@@ -12,7 +12,6 @@ import hashlib
 import json
 import logging
 import os
-import queue
 import secrets
 import sys
 import threading
@@ -20,13 +19,12 @@ import time
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
-from agent.tracing import NoopTracer, Tracer
 from api.settings import APISettings
 from config.paths import TRACE_LOG_DIR
 
@@ -44,6 +42,7 @@ def hash_ip(ip: str) -> str:
 # ---------------------------------------------------------------------------
 # 1. Tracers
 # ---------------------------------------------------------------------------
+
 
 class LocalJsonlTracer:
     """Writes structured execution traces to rotating local JSONL files."""
@@ -123,7 +122,9 @@ class LocalJsonlTracer:
         sanitized = dict(data)
         for k in ("question", "text", "prompt", "answer"):
             if k in sanitized and isinstance(sanitized[k], str):
-                sanitized[k] = f"len:{len(sanitized[k])}_hash:{hashlib.sha256(sanitized[k].encode()).hexdigest()[:8]}"
+                sanitized[k] = (
+                    f"len:{len(sanitized[k])}_hash:{hashlib.sha256(sanitized[k].encode()).hexdigest()[:8]}"
+                )
         return sanitized
 
 
@@ -166,10 +167,13 @@ class LangfuseTracer:
 # 2. Structured JSON Access Logger Middleware
 # ---------------------------------------------------------------------------
 
+
 class JsonAccessLoggerMiddleware(BaseHTTPMiddleware):
     """Logs structured JSON lines for every completed request."""
 
-    def __init__(self, app: Any, settings: APISettings, trusted_proxies: Optional[List[str]] = None):
+    def __init__(
+        self, app: Any, settings: APISettings, trusted_proxies: Optional[List[str]] = None
+    ):
         super().__init__(app)
         self.settings = settings
         self.trusted_proxies = set(trusted_proxies or [])
@@ -206,7 +210,9 @@ class JsonAccessLoggerMiddleware(BaseHTTPMiddleware):
             "method": request.method,
             "status": response.status_code,
             "latency_ms": latency_ms,
-            "mode": getattr(request.app.state, "mode", "unknown") if hasattr(request.app, "state") else "unknown",
+            "mode": getattr(request.app.state, "mode", "unknown")
+            if hasattr(request.app, "state")
+            else "unknown",
             "client_hash": client_hash,
         }
 
@@ -220,6 +226,7 @@ class JsonAccessLoggerMiddleware(BaseHTTPMiddleware):
 # ---------------------------------------------------------------------------
 # 3. Prometheus Metrics Collector
 # ---------------------------------------------------------------------------
+
 
 class SimpleMetricsRegistry:
     """Self-contained Prometheus-format metrics collector."""
@@ -297,42 +304,46 @@ class SimpleMetricsRegistry:
                 "# TYPE regulatoriq_requests_total counter",
             ]
             for (route, st, md), cnt in self.requests_total.items():
-                lines.append(f'regulatoriq_requests_total{{route="{route}",status="{st}",mode="{md}"}} {cnt}')
+                lines.append(
+                    f'regulatoriq_requests_total{{route="{route}",status="{st}",mode="{md}"}} {cnt}'
+                )
 
-            lines.extend([
-                "# HELP regulatoriq_ask_latency_seconds Cumulative ask latency in seconds",
-                "# TYPE regulatoriq_ask_latency_seconds summary",
-                f"regulatoriq_ask_latency_seconds_sum {self.ask_latency_sum:.4f}",
-                f"regulatoriq_ask_latency_seconds_count {self.ask_latency_count}",
-                "# HELP regulatoriq_time_to_first_token_seconds Time to first token",
-                "# TYPE regulatoriq_time_to_first_token_seconds summary",
-                f"regulatoriq_time_to_first_token_seconds_sum {self.ttft_sum:.4f}",
-                f"regulatoriq_time_to_first_token_seconds_count {self.ttft_count}",
-                "# HELP regulatoriq_refusals_total Total query refusals emitted",
-                "# TYPE regulatoriq_refusals_total counter",
-                f"regulatoriq_refusals_total {self.refusals_total}",
-                "# HELP regulatoriq_clarifications_total Total clarification requests",
-                "# TYPE regulatoriq_clarifications_total counter",
-                f"regulatoriq_clarifications_total {self.clarifications_total}",
-                "# HELP regulatoriq_llm_calls_total Total external LLM calls made",
-                "# TYPE regulatoriq_llm_calls_total counter",
-                f"regulatoriq_llm_calls_total {self.llm_calls_total}",
-                "# HELP regulatoriq_tokens_total Total tokens consumed",
-                "# TYPE regulatoriq_tokens_total counter",
-                f"regulatoriq_tokens_total {self.tokens_total}",
-                "# HELP regulatoriq_sanitiser_hits_total Total sensitive items sanitized",
-                "# TYPE regulatoriq_sanitiser_hits_total counter",
-                f"regulatoriq_sanitiser_hits_total {self.sanitiser_hits_total}",
-                "# HELP regulatoriq_warmups_total Total warmup queries executed",
-                "# TYPE regulatoriq_warmups_total counter",
-                f"regulatoriq_warmups_total {self.warmups_total}",
-                "# HELP regulatoriq_queue_waits_total Total concurrency queue waits",
-                "# TYPE regulatoriq_queue_waits_total counter",
-                f"regulatoriq_queue_waits_total {self.queue_waits_total}",
-                "# HELP regulatoriq_cancelled_total Total client-cancelled asks",
-                "# TYPE regulatoriq_cancelled_total counter",
-                f"regulatoriq_cancelled_total {self.cancelled_total}",
-            ])
+            lines.extend(
+                [
+                    "# HELP regulatoriq_ask_latency_seconds Cumulative ask latency in seconds",
+                    "# TYPE regulatoriq_ask_latency_seconds summary",
+                    f"regulatoriq_ask_latency_seconds_sum {self.ask_latency_sum:.4f}",
+                    f"regulatoriq_ask_latency_seconds_count {self.ask_latency_count}",
+                    "# HELP regulatoriq_time_to_first_token_seconds Time to first token",
+                    "# TYPE regulatoriq_time_to_first_token_seconds summary",
+                    f"regulatoriq_time_to_first_token_seconds_sum {self.ttft_sum:.4f}",
+                    f"regulatoriq_time_to_first_token_seconds_count {self.ttft_count}",
+                    "# HELP regulatoriq_refusals_total Total query refusals emitted",
+                    "# TYPE regulatoriq_refusals_total counter",
+                    f"regulatoriq_refusals_total {self.refusals_total}",
+                    "# HELP regulatoriq_clarifications_total Total clarification requests",
+                    "# TYPE regulatoriq_clarifications_total counter",
+                    f"regulatoriq_clarifications_total {self.clarifications_total}",
+                    "# HELP regulatoriq_llm_calls_total Total external LLM calls made",
+                    "# TYPE regulatoriq_llm_calls_total counter",
+                    f"regulatoriq_llm_calls_total {self.llm_calls_total}",
+                    "# HELP regulatoriq_tokens_total Total tokens consumed",
+                    "# TYPE regulatoriq_tokens_total counter",
+                    f"regulatoriq_tokens_total {self.tokens_total}",
+                    "# HELP regulatoriq_sanitiser_hits_total Total sensitive items sanitized",
+                    "# TYPE regulatoriq_sanitiser_hits_total counter",
+                    f"regulatoriq_sanitiser_hits_total {self.sanitiser_hits_total}",
+                    "# HELP regulatoriq_warmups_total Total warmup queries executed",
+                    "# TYPE regulatoriq_warmups_total counter",
+                    f"regulatoriq_warmups_total {self.warmups_total}",
+                    "# HELP regulatoriq_queue_waits_total Total concurrency queue waits",
+                    "# TYPE regulatoriq_queue_waits_total counter",
+                    f"regulatoriq_queue_waits_total {self.queue_waits_total}",
+                    "# HELP regulatoriq_cancelled_total Total client-cancelled asks",
+                    "# TYPE regulatoriq_cancelled_total counter",
+                    f"regulatoriq_cancelled_total {self.cancelled_total}",
+                ]
+            )
 
             for route, cnt in self.rate_limited_total.items():
                 lines.append(f'regulatoriq_rate_limited_total{{route="{route}"}} {cnt}')

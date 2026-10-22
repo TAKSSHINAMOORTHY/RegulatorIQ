@@ -6,18 +6,10 @@ for each production scenario (standard lookup, superseded validity, refusal, cla
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
-
-from config.paths import DOCS_DIR, EVENTS_SCHEMA
+from config.paths import DOCS_DIR
 
 
 def generate_events_doc() -> None:
-    schema = {}
-    if EVENTS_SCHEMA.exists():
-        with open(EVENTS_SCHEMA, "r", encoding="utf-8") as f:
-            schema = json.load(f)
-
     content = [
         "# RegulatorIQ: SSE Event Stream Protocol & Contract Documentation",
         "",

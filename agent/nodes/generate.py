@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 from agent.llm import LLM, ExtractiveLLMProvider
 from agent.state import AgentState
@@ -47,7 +47,11 @@ def node_generate(
         status_block = "\n".join(status_lines)
 
         # 1. FULL mode: generative LLM
-        if state.mode == "full" and llm is not None and not isinstance(llm.provider, ExtractiveLLMProvider):
+        if (
+            state.mode == "full"
+            and llm is not None
+            and not isinstance(llm.provider, ExtractiveLLMProvider)
+        ):
             full_context = bundle.text
             if status_block:
                 full_context += f"\n\n{status_block}"
@@ -62,14 +66,18 @@ def node_generate(
                 parsed = res.parsed_json or {}
                 if parsed.get("refused"):
                     state.refused = True
-                    state.refusal_reason = str(parsed.get("refusal_reason", "Insufficient official evidence"))
+                    state.refusal_reason = str(
+                        parsed.get("refusal_reason", "Insufficient official evidence")
+                    )
                     state.draft_answer = str(parsed.get("answer", state.refusal_reason))
                 else:
                     ans_text = str(parsed.get("answer", res.text.strip()))
                     state.draft_answer = ans_text
                 return state
             except Exception:
-                state.warnings.append("LLM generation failed, falling back to extractive rules mode")
+                state.warnings.append(
+                    "LLM generation failed, falling back to extractive rules mode"
+                )
 
         # 2. RULES mode: deterministic extractive answer synthesis
         lines = []

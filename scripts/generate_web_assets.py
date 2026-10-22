@@ -9,7 +9,8 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
+
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS_DESIGN = ROOT / "docs" / "design"
@@ -40,7 +41,9 @@ def create_screenshot(theme: str, path: Path):
         draw.line([(60, y), (1220, y)], fill=line_color, width=1)
 
     # Main Chat Card
-    draw.rounded_rectangle([260, 100, 1020, 680], radius=16, fill=card_color, outline=line_color, width=1)
+    draw.rounded_rectangle(
+        [260, 100, 1020, 680], radius=16, fill=card_color, outline=line_color, width=1
+    )
     draw.text((290, 130), "Regulatory Intelligence Engine", fill=accent_color)
     draw.text(
         (290, 170),
@@ -61,13 +64,23 @@ def create_screenshot(theme: str, path: Path):
     )
 
     # Source cards block
-    draw.rounded_rectangle([290, 380, 990, 480], radius=8, fill=bg_color, outline=accent_color, width=1)
+    draw.rounded_rectangle(
+        [290, 380, 990, 480], radius=8, fill=bg_color, outline=accent_color, width=1
+    )
     draw.text((310, 395), "[1] Master Circular - Basel III Capital Regulations", fill=ink_color)
-    draw.text((310, 420), "RBI/2023-24/04 | DOR.CAP.REC.4/21.06.001/2023-24 | STATUS: CURRENT", fill=accent_color)
+    draw.text(
+        (310, 420),
+        "RBI/2023-24/04 | DOR.CAP.REC.4/21.06.001/2023-24 | STATUS: CURRENT",
+        fill=accent_color,
+    )
 
     # Composer box at bottom of card
-    draw.rounded_rectangle([290, 600, 990, 650], radius=12, fill=bg_color, outline=line_color, width=1)
-    draw.text((310, 618), "Ask a regulatory compliance question... (Press / to focus)", fill=line_color)
+    draw.rounded_rectangle(
+        [290, 600, 990, 650], radius=12, fill=bg_color, outline=line_color, width=1
+    )
+    draw.text(
+        (310, 618), "Ask a regulatory compliance question... (Press / to focus)", fill=line_color
+    )
 
     img.save(path)
     print(f"Generated screenshot: {path}")

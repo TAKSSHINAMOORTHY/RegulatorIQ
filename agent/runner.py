@@ -73,8 +73,20 @@ class AgentRunner:
                 "tuned_on": "dev",
                 "default_system": "agent_full",
                 "budgets": {"max_graph_steps": 14, "max_llm_calls": 6, "max_retrieval_rounds": 3},
-                "thresholds": {"grade_threshold": 0.35, "refusal_conf_threshold": 0.15, "clarify_conf_threshold": 0.25},
-                "capabilities": {"router": True, "decompose": True, "grade_retry": True, "validity": True, "xref": True, "selfcheck": True, "clarify": True},
+                "thresholds": {
+                    "grade_threshold": 0.35,
+                    "refusal_conf_threshold": 0.15,
+                    "clarify_conf_threshold": 0.25,
+                },
+                "capabilities": {
+                    "router": True,
+                    "decompose": True,
+                    "grade_retry": True,
+                    "validity": True,
+                    "xref": True,
+                    "selfcheck": True,
+                    "clarify": True,
+                },
             }
 
         if overrides:
@@ -85,7 +97,9 @@ class AgentRunner:
                     config[k] = v
 
         if retriever is None:
-            retriever = Retriever.from_config(store=store) if store is not None else Retriever.from_config()
+            retriever = (
+                Retriever.from_config(store=store) if store is not None else Retriever.from_config()
+            )
 
         if llm is None:
             try:
@@ -123,7 +137,7 @@ class AgentRunner:
         state = AgentState(
             question=question,
             history=history or [],
-            mode=self.mode if "mode" not in opts else opts["mode"],
+            mode="full" if (opts.get("mode", self.mode) == "full") else "rules",
             interactive=bool(opts.get("interactive", False)),
             as_of=opts.get("as_of"),
             filters=opts.get("filters"),
@@ -182,7 +196,9 @@ class AgentRunner:
             return ev
 
         # 1. Initial status event
-        yield make_ev(EventType.STATUS, "init", {"message": "Initializing regulatory safety inspection"})
+        yield make_ev(
+            EventType.STATUS, "init", {"message": "Initializing regulatory safety inspection"}
+        )
 
         # Run internal execution
         ans = self.run(question, history=history, session_opts=session_opts)

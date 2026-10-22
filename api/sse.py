@@ -61,7 +61,9 @@ async def sse_event_stream_generator(
             # Wait for next event or heartbeat timeout
             event = await asyncio.wait_for(event_iterator.__anext__(), timeout=heartbeat_interval_s)
             ev_type = event.get("event") or event.get("type") or "status"
-            ev_data = event.get("data") or {k: v for k, v in event.items() if k not in ("event", "type")}
+            ev_data = event.get("data") or {
+                k: v for k, v in event.items() if k not in ("event", "type")
+            }
 
             # Enforce contract: token cannot precede grounding
             if ev_type == "grounding":

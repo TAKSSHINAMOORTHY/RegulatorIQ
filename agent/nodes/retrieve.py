@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
-
 from agent.state import AgentState
 from agent.tracing import Tracer
 from retrieval.pipeline import Retriever

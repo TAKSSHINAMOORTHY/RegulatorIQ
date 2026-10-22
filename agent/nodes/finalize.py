@@ -27,7 +27,7 @@ def node_finalize(
     max_steps: int = 14,
 ) -> AgentState:
     """Package final RagAnswer adhering to output contract."""
-    with tracer.span("finalize", {"step": "finalize"}) as span:
+    with tracer.span("finalize", {"step": "finalize"}):
         state.budget.steps = min(state.budget.steps + 1, max_steps)
 
         # Flatten evidence chunks in order
@@ -75,7 +75,11 @@ def node_finalize(
         if any("partially_redacted" in w for w in state.warnings):
             degraded_flags.append("partially_redacted")
 
-        ans_text = state.draft_answer or state.refusal_reason or (state.final.answer if state.final else "")
+        ans_text = (
+            state.draft_answer
+            or state.refusal_reason
+            or (state.final.answer if state.final else "")
+        )
         final_ans = RagAnswer(
             answer=ans_text,
             citations=citations,
@@ -111,5 +115,8 @@ def node_finalize(
         )
 
         state.final = final_ans
-        tracer.event("final", {"refused": state.refused, "citations_count": len(citations), "latency_ms": elapsed_ms})
+        tracer.event(
+            "final",
+            {"refused": state.refused, "citations_count": len(citations), "latency_ms": elapsed_ms},
+        )
         return state

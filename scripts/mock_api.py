@@ -13,15 +13,13 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
-import time
 from typing import Any, AsyncIterator, Dict, Optional
 
 import uvicorn
-from fastapi import FastAPI, Header, HTTPException, Request, Response, status
+from fastapi import FastAPI, Header, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
-
 
 app = FastAPI(
     title="RegulatorIQ Mock API",
@@ -137,121 +135,172 @@ async def post_ask(
     # Non-streaming JSON response
     if accept and "application/json" in accept and "text/event-stream" not in accept:
         if scenario == "refusal":
-            return JSONResponse({
-                "answer": "This query falls outside the official scope of Reserve Bank of India regulatory directives.",
-                "citations": [],
-                "refused": True,
+            return JSONResponse(
+                {
+                    "answer": "This query falls outside the official scope of Reserve Bank of India regulatory directives.",
+                    "citations": [],
+                    "refused": True,
+                    "retrieved": [],
+                    "timings": {"total_ms": 120.0},
+                    "usage": {"in": 50, "out": 20, "total": 70},
+                    "provider": "mock",
+                    "model": "mock-eval",
+                }
+            )
+        return JSONResponse(
+            {
+                "answer": "Under Master Direction - Know Your Customer (KYC) Direction, 2016, regulated entities must update KYC records periodically.",
+                "citations": [
+                    {
+                        "chunk_id": "rbi_kyc_2016_c001",
+                        "doc_id": "rbi_kyc_2016",
+                        "title": "Master Direction - Know Your Customer (KYC) Direction, 2016",
+                        "source_url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=11566",
+                        "section": "Section 4.1",
+                        "published_date": "2016-02-25",
+                        "status": "current",
+                    }
+                ],
+                "refused": False,
                 "retrieved": [],
-                "timings": {"total_ms": 120.0},
-                "usage": {"in": 50, "out": 20, "total": 70},
+                "timings": {"total_ms": 150.0},
+                "usage": {"in": 120, "out": 60, "total": 180},
                 "provider": "mock",
                 "model": "mock-eval",
-            })
-        return JSONResponse({
-            "answer": "Under Master Direction - Know Your Customer (KYC) Direction, 2016, regulated entities must update KYC records periodically.",
-            "citations": [
-                {
-                    "chunk_id": "rbi_kyc_2016_c001",
-                    "doc_id": "rbi_kyc_2016",
-                    "title": "Master Direction - Know Your Customer (KYC) Direction, 2016",
-                    "source_url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=11566",
-                    "section": "Section 4.1",
-                    "published_date": "2016-02-25",
-                    "status": "current",
-                }
-            ],
-            "refused": False,
-            "retrieved": [],
-            "timings": {"total_ms": 150.0},
-            "usage": {"in": 120, "out": 60, "total": 180},
-            "provider": "mock",
-            "model": "mock-eval",
-        })
+            }
+        )
 
     # SSE Streaming response
     async def event_generator() -> AsyncIterator[str]:
         seq = 1
-        yield sse_frame("meta", {"request_id": "mock-req-1234", "mode": "full", "index_version": "2.1.0-mock"}, seq)
+        yield sse_frame(
+            "meta",
+            {"request_id": "mock-req-1234", "mode": "full", "index_version": "2.1.0-mock"},
+            seq,
+        )
         seq += 1
 
         if scenario == "refusal":
             yield sse_frame("status", {"message": "Screening regulatory safety guardrails"}, seq)
             seq += 1
-            yield sse_frame("refusal", {
-                "reason": "out_of_scope",
-                "message": "Query falls outside official RBI regulatory framework.",
-                "guidance": "Please consult official RBI Master Directions on rbi.org.in.",
-            }, seq)
+            yield sse_frame(
+                "refusal",
+                {
+                    "reason": "out_of_scope",
+                    "message": "Query falls outside official RBI regulatory framework.",
+                    "guidance": "Please consult official RBI Master Directions on rbi.org.in.",
+                },
+                seq,
+            )
             return
 
         if scenario == "clarification":
             yield sse_frame("status", {"message": "Resolving regulatory scope"}, seq)
             seq += 1
-            yield sse_frame("clarification", {
-                "question": "Are you asking with respect to Scheduled Commercial Banks or Non-Banking Financial Companies (NBFCs)?",
-                "options": ["Commercial Banks", "NBFCs"],
-            }, seq)
+            yield sse_frame(
+                "clarification",
+                {
+                    "question": "Are you asking with respect to Scheduled Commercial Banks or Non-Banking Financial Companies (NBFCs)?",
+                    "options": ["Commercial Banks", "NBFCs"],
+                },
+                seq,
+            )
             return
 
         if scenario == "error":
             yield sse_frame("status", {"message": "Executing regulatory search"}, seq)
             seq += 1
             yield sse_frame("error", {"message": "Upstream service timeout"}, seq)
-            yield sse_frame("final", {"answer": "An error occurred during query execution.", "refused": True, "citations": []}, seq)
+            yield sse_frame(
+                "final",
+                {
+                    "answer": "An error occurred during query execution.",
+                    "refused": True,
+                    "citations": [],
+                },
+                seq,
+            )
             return
 
         # Default & Superseded Scenarios
         yield sse_frame("status", {"message": "Formulating retrieval strategy"}, seq)
         seq += 1
-        yield sse_frame("plan", {"steps": ["Retrieve Master Directions", "Verify temporal supersession"]}, seq)
+        yield sse_frame(
+            "plan", {"steps": ["Retrieve Master Directions", "Verify temporal supersession"]}, seq
+        )
         seq += 1
         yield sse_frame("retrieval", {"count": 3, "query": q}, seq)
         seq += 1
         yield sse_frame("grade", {"relevant": 3, "irrelevant": 0}, seq)
         seq += 1
         if scenario == "superseded":
-            yield sse_frame("validity", {
-                "status": "superseded",
-                "superseded_by": "RBI/2023-24/MD-01",
-                "note": "Replaced by Master Direction - Reserve Bank of India (KYC) Update, 2023",
-            }, seq)
+            yield sse_frame(
+                "validity",
+                {
+                    "status": "superseded",
+                    "superseded_by": "RBI/2023-24/MD-01",
+                    "note": "Replaced by Master Direction - Reserve Bank of India (KYC) Update, 2023",
+                },
+                seq,
+            )
             seq += 1
         yield sse_frame("grounding", {"supported_ratio": 1.0, "calibrated_confidence": 0.96}, seq)
         seq += 1
 
-        tokens = ["According ", "to ", "Master ", "Direction ", "on ", "KYC, ", "regulated ", "entities ", "must ", "verify ", "customer ", "identity. [1]"]
+        tokens = [
+            "According ",
+            "to ",
+            "Master ",
+            "Direction ",
+            "on ",
+            "KYC, ",
+            "regulated ",
+            "entities ",
+            "must ",
+            "verify ",
+            "customer ",
+            "identity. [1]",
+        ]
         for t in tokens:
             yield sse_frame("token", {"text": t}, seq)
             seq += 1
             await asyncio.sleep(0.01)
 
-        yield sse_frame("citation", {
-            "index": 1,
-            "doc_id": "rbi_kyc_2016",
-            "title": "Master Direction - Know Your Customer (KYC) Direction, 2016",
-            "source_url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=11566",
-            "section": "Section 4",
-            "published_date": "2016-02-25",
-            "status": "current",
-        }, seq)
+        yield sse_frame(
+            "citation",
+            {
+                "index": 1,
+                "doc_id": "rbi_kyc_2016",
+                "title": "Master Direction - Know Your Customer (KYC) Direction, 2016",
+                "source_url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=11566",
+                "section": "Section 4",
+                "published_date": "2016-02-25",
+                "status": "current",
+            },
+            seq,
+        )
         seq += 1
 
-        yield sse_frame("final", {
-            "answer": "According to Master Direction on KYC, regulated entities must verify customer identity. [1]",
-            "refused": False,
-            "citations": [
-                {
-                    "index": 1,
-                    "doc_id": "rbi_kyc_2016",
-                    "title": "Master Direction - Know Your Customer (KYC) Direction, 2016",
-                    "source_url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=11566",
-                    "section": "Section 4",
-                    "published_date": "2016-02-25",
-                    "status": "current",
-                }
-            ],
-            "timings": {"total_ms": 150.0},
-        }, seq)
+        yield sse_frame(
+            "final",
+            {
+                "answer": "According to Master Direction on KYC, regulated entities must verify customer identity. [1]",
+                "refused": False,
+                "citations": [
+                    {
+                        "index": 1,
+                        "doc_id": "rbi_kyc_2016",
+                        "title": "Master Direction - Know Your Customer (KYC) Direction, 2016",
+                        "source_url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=11566",
+                        "section": "Section 4",
+                        "published_date": "2016-02-25",
+                        "status": "current",
+                    }
+                ],
+                "timings": {"total_ms": 150.0},
+            },
+            seq,
+        )
 
     return StreamingResponse(
         event_generator(),

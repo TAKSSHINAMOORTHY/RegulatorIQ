@@ -87,7 +87,9 @@ def warmup_target(url: str, token: str, max_retries: int = 4) -> bool:
             with urllib.request.urlopen(req, timeout=120) as resp:
                 if resp.status == 200:
                     body = json.loads(resp.read().decode("utf-8"))
-                    print(f"[{url}] Warmup succeeded (status=200, time={body.get('warmup_time_ms', 'N/A')}ms)")
+                    print(
+                        f"[{url}] Warmup succeeded (status=200, time={body.get('warmup_time_ms', 'N/A')}ms)"
+                    )
                     return True
         except urllib.error.HTTPError as e:
             if e.code == 401:
@@ -103,13 +105,17 @@ def warmup_target(url: str, token: str, max_retries: int = 4) -> bool:
 def main():
     parser = argparse.ArgumentParser(description="RegulatorIQ Keep-Warm Runner")
     parser.add_argument("--urls", help="Comma-separated target URLs")
-    parser.add_argument("--token", default=os.environ.get("WARMUP_TOKEN", "test_warmup_token_12345"))
+    parser.add_argument(
+        "--token", default=os.environ.get("WARMUP_TOKEN", "test_warmup_token_12345")
+    )
     parser.add_argument("--force", action="store_true", help="Ignore rolling 24h cap check")
     args = parser.parse_args()
 
     now = time.time()
     if not args.force and not check_daily_cap(now):
-        print(f"Hard cap reached: already performed {MAX_DAILY_RUNS} keep-warm runs in the past 24 hours. Aborting.")
+        print(
+            f"Hard cap reached: already performed {MAX_DAILY_RUNS} keep-warm runs in the past 24 hours. Aborting."
+        )
         sys.exit(0)
 
     urls = []

@@ -60,4 +60,5 @@ class RagAnswer:
     def to_dict(self) -> Dict[str, Any]:
         """Convert RagAnswer dataclass to dictionary."""
         from dataclasses import asdict
+
         return asdict(self)

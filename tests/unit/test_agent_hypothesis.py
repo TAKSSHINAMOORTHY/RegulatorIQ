@@ -10,12 +10,11 @@ Guarantees tested across randomized inputs:
 
 from __future__ import annotations
 
-import re
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
-from hypothesis import given, settings, strategies as st
+from hypothesis import given, settings
+from hypothesis import strategies as st
 
-from agent.runner import AgentRunner
 from agent.types import RagAnswer
 from tests.unit.test_agent_scenarios import create_scenario_runner
 
@@ -26,7 +25,9 @@ from tests.unit.test_agent_scenarios import create_scenario_runner
     as_of=st.sampled_from([None, "2024-04-01", "2020-01-01", "2026-01-01"]),
 )
 @settings(max_examples=40, deadline=None)
-def test_graph_termination_and_budget_invariants(question: str, interactive: bool, as_of: Optional[str]) -> None:
+def test_graph_termination_and_budget_invariants(
+    question: str, interactive: bool, as_of: Optional[str]
+) -> None:
     """Graph must strictly terminate within 14 steps and respect all budget invariants."""
     runner = create_scenario_runner()
     opts = {"interactive": interactive, "as_of": as_of}

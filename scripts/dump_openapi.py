@@ -7,7 +7,6 @@ with sorted keys and clean formatting for frontend codegen and contract testing.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 from api.main import create_app
 from api.settings import APISettings

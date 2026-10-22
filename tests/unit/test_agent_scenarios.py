@@ -4,16 +4,13 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, List, Optional
-from unittest.mock import MagicMock
+from typing import Any, Dict, List, Optional
 
 import pytest
 
 from agent.runner import AgentRunner
 from agent.types import RagAnswer
 from config.paths import SCENARIOS_DIR
-from retrieval.hybrid import RankedChunk
 from retrieval.pipeline import Retriever
 from retrieval.rerank import FakeReranker
 
@@ -50,7 +47,9 @@ class ScenarioLink:
 class ScenarioIndexStore:
     """Configurable synthetic store for scenario evaluation."""
 
-    def __init__(self, chunks: List[ScenarioChunk], links: Optional[List[ScenarioLink]] = None) -> None:
+    def __init__(
+        self, chunks: List[ScenarioChunk], links: Optional[List[ScenarioLink]] = None
+    ) -> None:
         self.chunks_map = {c.chunk_id: c for c in chunks}
         self.links_list = links or []
 
@@ -61,13 +60,18 @@ class ScenarioIndexStore:
         return [c for c in self.chunks_map.values() if c.doc_id == doc_id]
 
     def links_for(self, doc_id: str) -> List[ScenarioLink]:
-        return [l for l in self.links_list if l.src_doc_id == doc_id]
+        return [link for link in self.links_list if link.src_doc_id == doc_id]
 
     def lookup_identifier(self, ident: str) -> List[str]:
-        return [c.chunk_id for c in self.chunks_map.values() if c.circular_no and ident.lower() in c.circular_no.lower()]
+        return [
+            c.chunk_id
+            for c in self.chunks_map.values()
+            if c.circular_no and ident.lower() in c.circular_no.lower()
+        ]
 
     def search_dense(self, query: str, k: int = 50, filters: Optional[Any] = None) -> List[Any]:
         from retrieval.index_store import Hit
+
         hits = []
         for i, c in enumerate(self.chunks_map.values(), start=1):
             hits.append(Hit(chunk_id=c.chunk_id, score=1.0 / (i + 1), rank=i))
@@ -77,6 +81,7 @@ class ScenarioIndexStore:
 
     def search_bm25(self, query: str, k: int = 50, filters: Optional[Any] = None) -> List[Any]:
         from retrieval.index_store import Hit
+
         hits = []
         for i, c in enumerate(self.chunks_map.values(), start=1):
             hits.append(Hit(chunk_id=c.chunk_id, score=10.0 / (i + 1), rank=i))
@@ -88,12 +93,16 @@ class ScenarioIndexStore:
 def create_scenario_runner() -> AgentRunner:
     """Create test runner wired to synthetic scenario store."""
     c1 = ScenarioChunk(
-        "c_target", "d_target", 0,
+        "c_target",
+        "d_target",
+        0,
         "The statutory liquidity ratio (SLR) requirement is 18.0 percent. The exposure limit is 25 percent under circular RBI/2025-26/90.",
         circular_no="RBI/2025-26/90",
     )
     c_old = ScenarioChunk(
-        "c_old", "d_old", 0,
+        "c_old",
+        "d_old",
+        0,
         "Old guidelines specified 15 crore.",
         is_current=False,
         circular_no="RBI/2020-21/10",
@@ -102,20 +111,39 @@ def create_scenario_runner() -> AgentRunner:
         valid_to="2024-03-31",
     )
     c_new = ScenarioChunk(
-        "c_new", "d_new", 0,
+        "c_new",
+        "d_new",
+        0,
         "Current KYC norms as amended by recent directions require Aadhaar-based e-KYC.",
         circular_no="RBI/2025-26/12",
     )
     c_ref = ScenarioChunk(
-        "c_ref", "d_ref", 0,
+        "c_ref",
+        "d_ref",
+        0,
         "Section 42 of RBI Act defines scheduled bank cash reserve ratios.",
         circular_no="RBI/2025-26/88",
     )
 
     links = [
-        ScenarioLink(src_doc_id="d_old", rel_type="superseded_by", target_doc_id="d_new", target_circular_no="RBI/2025-26/12"),
-        ScenarioLink(src_doc_id="d_new", rel_type="amended_by", target_doc_id="d_amend", target_circular_no="RBI/2025-26/99"),
-        ScenarioLink(src_doc_id="d_target", rel_type="refers_to", target_doc_id="d_ref", target_circular_no="RBI/2025-26/88"),
+        ScenarioLink(
+            src_doc_id="d_old",
+            rel_type="superseded_by",
+            target_doc_id="d_new",
+            target_circular_no="RBI/2025-26/12",
+        ),
+        ScenarioLink(
+            src_doc_id="d_new",
+            rel_type="amended_by",
+            target_doc_id="d_amend",
+            target_circular_no="RBI/2025-26/99",
+        ),
+        ScenarioLink(
+            src_doc_id="d_target",
+            rel_type="refers_to",
+            target_doc_id="d_ref",
+            target_circular_no="RBI/2025-26/88",
+        ),
     ]
 
     store = ScenarioIndexStore([c1, c_old, c_new, c_ref], links=links)
@@ -137,9 +165,19 @@ def create_scenario_runner() -> AgentRunner:
         "tuned_on": "dev",
         "default_system": "agent_full",
         "budgets": {"max_graph_steps": 14, "max_llm_calls": 6, "max_retrieval_rounds": 3},
-        "thresholds": {"grade_threshold": 0.0, "refusal_conf_threshold": 0.15, "clarify_conf_threshold": 0.25},
+        "thresholds": {
+            "grade_threshold": 0.0,
+            "refusal_conf_threshold": 0.15,
+            "clarify_conf_threshold": 0.25,
+        },
         "capabilities": {
-            "router": True, "decompose": True, "grade_retry": True, "validity": True, "xref": True, "selfcheck": True, "clarify": True
+            "router": True,
+            "decompose": True,
+            "grade_retry": True,
+            "validity": True,
+            "xref": True,
+            "selfcheck": True,
+            "clarify": True,
         },
     }
 
@@ -155,7 +193,9 @@ def get_all_scenarios() -> List[Dict[str, Any]]:
     return scenarios
 
 
-@pytest.mark.parametrize("sc", get_all_scenarios(), ids=lambda s: f"scenario_{s['id']:02d}_{s['name']}")
+@pytest.mark.parametrize(
+    "sc", get_all_scenarios(), ids=lambda s: f"scenario_{s['id']:02d}_{s['name']}"
+)
 def test_all_18_scenarios(sc: Dict[str, Any]) -> None:
     runner = create_scenario_runner()
     sc_id = sc["id"]
@@ -188,7 +228,10 @@ def test_all_18_scenarios(sc: Dict[str, Any]) -> None:
     # 5. Amendment chain
     elif sc_id == 5:
         assert ans.refused is False
-        assert any("amended" in vf.get("status", "") for vf in ans.validity_findings) or "as amended by" in ans.answer.lower()
+        assert (
+            any("amended" in vf.get("status", "") for vf in ans.validity_findings)
+            or "as amended by" in ans.answer.lower()
+        )
 
     # 6. Xref follow
     elif sc_id == 6:

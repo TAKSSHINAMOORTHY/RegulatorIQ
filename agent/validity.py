@@ -9,7 +9,7 @@ Guarantees:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, List, Optional, Set
 
 from retrieval.hybrid import RankedChunk
 
@@ -69,13 +69,15 @@ class ValidityResolver:
             superseded_by: List[str] = []
             amended_by: List[str] = []
 
-            for l in links:
-                rel = getattr(l, "rel_type", "") or getattr(l, "relationship", "")
-                target_doc = getattr(l, "target_doc_id", "") or getattr(l, "tgt_doc_id", "")
-                target_circ = getattr(l, "target_circular_no", "") or target_doc
+            for link_item in links:
+                rel = getattr(link_item, "rel_type", "") or getattr(link_item, "relationship", "")
+                target_doc = getattr(link_item, "target_doc_id", "") or getattr(
+                    link_item, "tgt_doc_id", ""
+                )
+                target_circ = getattr(link_item, "target_circular_no", "") or target_doc
 
                 if rel in ("superseded_by", "repealed_by", "withdrawn_by") or (
-                    rel == "supersedes" and getattr(l, "src_doc_id", "") == doc_id
+                    rel == "supersedes" and getattr(link_item, "src_doc_id", "") == doc_id
                 ):
                     if target_circ and target_circ not in superseded_by:
                         superseded_by.append(target_circ)

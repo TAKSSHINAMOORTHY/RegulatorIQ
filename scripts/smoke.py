@@ -12,11 +12,10 @@ Validates:
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import sys
-import time
 from urllib.parse import urlparse
+
 import httpx
 
 MOCK_OR_REAL_URL = os.environ.get("SMOKE_TARGET_URL", "http://localhost:8000")
@@ -66,7 +65,7 @@ def run_smoke_suite(base_url: str = MOCK_OR_REAL_URL) -> dict[str, bool]:
             has_frame = headers.get("X-Frame-Options") in ("DENY", "SAMEORIGIN")
             results["security_headers"] = has_nosniff and has_frame
             print(f"✓ Security headers: nosniff={has_nosniff}, frame={has_frame}")
-        except Exception as e:
+        except Exception:
             results["security_headers"] = False
 
         # 4. Warmup authentication
@@ -81,7 +80,7 @@ def run_smoke_suite(base_url: str = MOCK_OR_REAL_URL) -> dict[str, bool]:
                 headers={"Authorization": f"Bearer {WARMUP_TOKEN}", "X-Warmup": "1"},
             )
             auth_ok = r_auth.status_code in (200, 401)  # 401 if test token differs from server env
-            results["warmup_auth"] = unauth_ok
+            results["warmup_auth"] = unauth_ok and auth_ok
             print(f"✓ /warmup auth: unauthenticated={r_no_auth.status_code} (expected 401)")
         except Exception as e:
             print(f"✗ /warmup check failed: {e}")
@@ -108,13 +107,14 @@ def run_smoke_suite(base_url: str = MOCK_OR_REAL_URL) -> dict[str, bool]:
         try:
             oos_payload = {"question": "How do I make chocolate cake?"}
             r = client.post("/ask", json=oos_payload, headers={"Accept": "application/json"})
-            is_refusal = (
-                r.status_code in (200, 400)
-                and ("refused" in r.text.lower() or "outside" in r.text.lower() or "policy" in r.text.lower())
+            is_refusal = r.status_code in (200, 400) and (
+                "refused" in r.text.lower()
+                or "outside" in r.text.lower()
+                or "policy" in r.text.lower()
             )
             results["out_of_scope_refusal"] = is_refusal
             print(f"✓ Out-of-scope refusal: status={r.status_code}")
-        except Exception as e:
+        except Exception:
             results["out_of_scope_refusal"] = False
 
         # 7. Body size limit (> 64KB -> 413)
@@ -123,7 +123,7 @@ def run_smoke_suite(base_url: str = MOCK_OR_REAL_URL) -> dict[str, bool]:
             r = client.post("/ask", json=huge_payload)
             results["oversize_body_413"] = r.status_code == 413
             print(f"✓ Oversize body: {r.status_code} (expected 413)")
-        except Exception as e:
+        except Exception:
             results["oversize_body_413"] = False
 
     passed = sum(1 for v in results.values() if v)

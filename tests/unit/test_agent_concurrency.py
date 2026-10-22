@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import concurrent.futures
-from typing import List
 
-from agent.runner import AgentRunner
 from agent.types import RagAnswer
 from tests.unit.test_agent_scenarios import create_scenario_runner
 

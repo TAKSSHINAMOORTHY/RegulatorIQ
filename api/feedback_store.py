@@ -79,7 +79,13 @@ class FeedbackStore:
                         conn.execute(
                             "INSERT INTO feedback (request_id, rating, reason, comment, timestamp) "
                             "VALUES (?, ?, ?, ?, ?)",
-                            (req.request_id, req.rating, req.reason, clean_comment, record["timestamp"]),
+                            (
+                                req.request_id,
+                                req.rating,
+                                req.reason,
+                                clean_comment,
+                                record["timestamp"],
+                            ),
                         )
                         conn.commit()
                 except Exception as e:

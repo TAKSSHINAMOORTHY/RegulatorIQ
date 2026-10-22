@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any, List, Optional, Tuple
+from typing import Optional
 
 from agent.llm import LLM, ExtractiveLLMProvider
-from agent.selfcheck import GroundingReport, SelfChecker
+from agent.selfcheck import SelfChecker
 from agent.state import AgentState
 from agent.tracing import Tracer
 from retrieval.context import build_context
@@ -41,8 +41,14 @@ def node_selfcheck(
         regens = 0
         while not report.passed and regens < max_regenerations:
             regens += 1
-            if state.mode == "full" and llm is not None and not isinstance(llm.provider, ExtractiveLLMProvider):
-                unsupported_list = "\n".join(f"- {c['claim']}" for c in report.claims if c["status"] == "unsupported")
+            if (
+                state.mode == "full"
+                and llm is not None
+                and not isinstance(llm.provider, ExtractiveLLMProvider)
+            ):
+                unsupported_list = "\n".join(
+                    f"- {c['claim']}" for c in report.claims if c["status"] == "unsupported"
+                )
                 failures_list = "\n".join(f"- {f}" for f in report.hard_check_failures)
                 corr_prompt = (
                     f"Your previous regulatory compliance answer failed factual grounding verification.\n\n"
@@ -52,7 +58,7 @@ def node_selfcheck(
                     f"Omit any claim that cannot be proven directly from the official citations.\n\n"
                     f"Context:\n{bundle.text}\n\n"
                     f"Question: {state.standalone_question or state.question}\n\n"
-                    f"Return JSON: {{\"answer\": \"...\", \"citations\": [...]}}"
+                    f'Return JSON: {{"answer": "...", "citations": [...]}}'
                 )
                 try:
                     res = llm.generate([{"role": "user", "content": corr_prompt}], max_tokens=1024)
@@ -68,7 +74,9 @@ def node_selfcheck(
 
         # If still failing after regeneration -> prune unsupported sentences
         if not report.passed:
-            pruned_text, redacted_sentences = checker.prune_unsupported_sentences(state.draft_answer, report)
+            pruned_text, redacted_sentences = checker.prune_unsupported_sentences(
+                state.draft_answer, report
+            )
             if pruned_text.strip() and len(pruned_text.split()) >= 10:
                 state.draft_answer = pruned_text
                 state.warnings.append("partially_redacted: ungrounded regulatory claims removed")

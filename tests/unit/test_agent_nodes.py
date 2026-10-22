@@ -18,12 +18,8 @@ Covers:
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
-from typing import Any, List, Optional
-from unittest.mock import MagicMock
-
-import pytest
+from typing import Optional
 
 from agent.events import AgentEvent, EventType, validate_event_order
 from agent.guards import SafetyGuard, luhn_checksum_valid
@@ -34,7 +30,6 @@ from agent.nodes.finalize import is_rbi_url, node_finalize
 from agent.nodes.generate import node_generate
 from agent.nodes.grade import node_grade
 from agent.nodes.guard import node_guard
-from agent.nodes.retrieve import node_retrieve
 from agent.nodes.rewrite_retry import node_rewrite_retry
 from agent.nodes.route import node_route
 from agent.nodes.selfcheck import node_selfcheck
@@ -99,7 +94,9 @@ def test_guard_node_outcomes() -> None:
     assert "personal_advice_request" in res_adv.warnings
 
     # PII detection & redaction (PAN + Email + Phone)
-    s_pii = AgentState(question="My email is compliance@bank.com and PAN is ABCDE1234F, what is CRR?")
+    s_pii = AgentState(
+        question="My email is compliance@bank.com and PAN is ABCDE1234F, what is CRR?"
+    )
     res_pii = node_guard(s_pii, guard, policy, tracer)
     assert res_pii.refused is False
     assert "[EMAIL REDACTED]" in res_pii.question
@@ -169,7 +166,9 @@ def test_decompose_node() -> None:
     tmpl = "{question}"
 
     # Comparison query -> splits into 2 sub-questions
-    s_comp = AgentState(question="Compare CRR requirements for Commercial Banks and Cooperative Banks")
+    s_comp = AgentState(
+        question="Compare CRR requirements for Commercial Banks and Cooperative Banks"
+    )
     res_comp = node_decompose(s_comp, None, tracer, tmpl)
     assert res_comp.plan.strategy == "compare"
     assert len(res_comp.plan.sub_questions) == 2
@@ -197,7 +196,9 @@ def test_grade_node() -> None:
         evidence={"q1": [rc1, rc2]},
     )
 
-    s_out, outcome = node_grade(state, None, tracer, tmpl, grade_threshold=0.35, min_relevant_chunks=1)
+    s_out, outcome = node_grade(
+        state, None, tracer, tmpl, grade_threshold=0.35, min_relevant_chunks=1
+    )
     assert outcome == "enough"
     assert s_out.grades["c1"]["verdict"] == "relevant"
     assert s_out.grades["c2"]["verdict"] == "irrelevant"
@@ -239,11 +240,19 @@ def test_validity_node() -> None:
     class FakeLinkStore:
         def links_for(self, doc_id: str):
             if doc_id == "d_old":
-                return [DummyLink(rel_type="superseded_by", target_doc_id="d_new", target_circular_no="RBI/2025-26/99")]
+                return [
+                    DummyLink(
+                        rel_type="superseded_by",
+                        target_doc_id="d_new",
+                        target_circular_no="RBI/2025-26/99",
+                    )
+                ]
             return []
 
     resolver = ValidityResolver(store=FakeLinkStore())
-    c_old = DummyChunk("c_old", "d_old", 0, "Old rule", is_current=False, circular_no="RBI/2020-21/10")
+    c_old = DummyChunk(
+        "c_old", "d_old", 0, "Old rule", is_current=False, circular_no="RBI/2020-21/10"
+    )
     rc_old = RankedChunk(c_old, 0.8, 0.8, 1, "superseded")
 
     state = AgentState(
@@ -272,7 +281,11 @@ def test_xref_node() -> None:
 
     class FakeXRefStore:
         def links_for(self, doc_id: str):
-            return [DummyLink(rel_type="refers_to", target_doc_id="d_ref", target_circular_no="RBI/2025-26/88")]
+            return [
+                DummyLink(
+                    rel_type="refers_to", target_doc_id="d_ref", target_circular_no="RBI/2025-26/88"
+                )
+            ]
 
         def doc_chunks(self, doc_id: str):
             return [DummyChunk("c_ref1", "d_ref", 0, "Referenced Section 42 text")]
@@ -297,7 +310,9 @@ def test_generate_node_rules_mode() -> None:
     tracer = InMemoryTracer()
     tmpl = "{context}\n{question}"
 
-    c1 = DummyChunk("c1", "d1", 0, "Cash Reserve Ratio is 4.5 percent. Scheduled banks must comply.")
+    c1 = DummyChunk(
+        "c1", "d1", 0, "Cash Reserve Ratio is 4.5 percent. Scheduled banks must comply."
+    )
     rc1 = RankedChunk(c1, 0.9, 0.9, 1, "current")
 
     state = AgentState(
@@ -354,8 +369,12 @@ def test_finalize_node() -> None:
     assert is_rbi_url("https://malicious-site.com/fake_rbi") is False
     assert is_rbi_url("") is False
 
-    c1 = DummyChunk("c1", "d1", 0, "Reserve requirement is 4.5% [1].", source_url="https://www.rbi.org.in/valid")
-    c_bad_url = DummyChunk("c2", "d2", 0, "Bad url chunk [2].", source_url="https://thirdparty.com/leak")
+    c1 = DummyChunk(
+        "c1", "d1", 0, "Reserve requirement is 4.5% [1].", source_url="https://www.rbi.org.in/valid"
+    )
+    c_bad_url = DummyChunk(
+        "c2", "d2", 0, "Bad url chunk [2].", source_url="https://thirdparty.com/leak"
+    )
     rc1 = RankedChunk(c1, 0.9, 0.9, 1, "current")
     rc2 = RankedChunk(c_bad_url, 0.8, 0.8, 2, "current")
 
@@ -384,9 +403,13 @@ def test_event_contract_order() -> None:
         AgentEvent(seq=3, step="retrieve", type=EventType.RETRIEVAL.value, data={"count": 5}),
         AgentEvent(seq=4, step="grade", type=EventType.GRADE.value, data={"graded": 5}),
         AgentEvent(seq=5, step="selfcheck", type=EventType.GROUNDING.value, data={"passed": True}),
-        AgentEvent(seq=6, step="generate", type=EventType.TOKEN.value, data={"text": "According to RBI"}),
+        AgentEvent(
+            seq=6, step="generate", type=EventType.TOKEN.value, data={"text": "According to RBI"}
+        ),
         AgentEvent(seq=7, step="finalize", type=EventType.CITATION.value, data={"ref_num": 1}),
-        AgentEvent(seq=8, step="finalize", type=EventType.FINAL.value, data={"answer": "According to RBI"}),
+        AgentEvent(
+            seq=8, step="finalize", type=EventType.FINAL.value, data={"answer": "According to RBI"}
+        ),
     ]
 
     ok, violations = validate_event_order(events)
@@ -395,7 +418,9 @@ def test_event_contract_order() -> None:
 
     # Token before grounding -> violation
     bad_events = [
-        AgentEvent(seq=1, step="generate", type=EventType.TOKEN.value, data={"text": "Premature token"}),
+        AgentEvent(
+            seq=1, step="generate", type=EventType.TOKEN.value, data={"text": "Premature token"}
+        ),
         AgentEvent(seq=2, step="selfcheck", type=EventType.GROUNDING.value, data={"passed": True}),
         AgentEvent(seq=3, step="finalize", type=EventType.FINAL.value, data={"answer": "Text"}),
     ]

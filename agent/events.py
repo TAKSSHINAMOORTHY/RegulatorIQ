@@ -56,21 +56,18 @@ def validate_event_order(events: List[AgentEvent]) -> Tuple[bool, List[str]]:
     """Validate that the list of streamed events adheres strictly to the contract order."""
     violations: List[str] = []
     has_grounding = False
-    tokens_seen = False
     final_seen = False
 
     for i, ev in enumerate(events):
         # Monotonic sequence check
         if ev.seq != i + 1:
-            violations.append(f"Event seq mismatch at index {i}: expected {i+1}, got {ev.seq}")
+            violations.append(f"Event seq mismatch at index {i}: expected {i + 1}, got {ev.seq}")
 
         if ev.type == EventType.GROUNDING.value:
             has_grounding = True
 
-        if ev.type == EventType.TOKEN.value:
-            tokens_seen = True
-            if not has_grounding:
-                violations.append("Violation: 'token' event emitted before 'grounding' event")
+        if ev.type == EventType.TOKEN.value and not has_grounding:
+            violations.append("Violation: 'token' event emitted before 'grounding' event")
 
         if ev.type == EventType.FINAL.value:
             final_seen = True

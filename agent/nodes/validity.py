@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any, List
-
 from agent.state import AgentState
 from agent.tracing import Tracer
 from agent.validity import ValidityResolver

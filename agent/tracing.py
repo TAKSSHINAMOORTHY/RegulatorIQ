@@ -10,23 +10,21 @@ from __future__ import annotations
 
 import time
 from contextlib import contextmanager
-from typing import Any, Dict, Iterator, List, Optional, Protocol
+from typing import Any, ContextManager, Dict, Iterator, List, Optional, Protocol
 
 
 class Tracer(Protocol):
     """Protocol for tracing agent execution across nodes and spans."""
 
-    def span(self, name: str, attrs: Optional[Dict[str, Any]] = None) -> Iterator[Dict[str, Any]]:
-        ...
+    def span(
+        self, name: str, attrs: Optional[Dict[str, Any]] = None
+    ) -> ContextManager[Dict[str, Any]]: ...
 
-    def event(self, name: str, attrs: Optional[Dict[str, Any]] = None) -> None:
-        ...
+    def event(self, name: str, attrs: Optional[Dict[str, Any]] = None) -> None: ...
 
-    def set_usage(self, calls: int, tokens: int) -> None:
-        ...
+    def set_usage(self, calls: int, tokens: int) -> None: ...
 
-    def get_trace(self) -> List[Dict[str, Any]]:
-        ...
+    def get_trace(self) -> List[Dict[str, Any]]: ...
 
 
 class NoopTracer:

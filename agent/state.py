@@ -17,7 +17,9 @@ class SubQuestion(BaseModel):
     id: str = Field(..., description="Unique sub-question identifier e.g. 'q1'")
     text: str = Field(..., description="Self-contained query string")
     intent: Optional[str] = Field(default=None, description="Inferred intent")
-    combine_strategy: Optional[str] = Field(default="merge", description="compare | merge | sequence")
+    combine_strategy: Optional[str] = Field(
+        default="merge", description="compare | merge | sequence"
+    )
 
 
 class PlanState(BaseModel):

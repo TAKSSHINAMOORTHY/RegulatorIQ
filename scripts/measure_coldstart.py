@@ -6,10 +6,10 @@ Outputs reports/coldstart.md.
 from __future__ import annotations
 
 import argparse
-import json
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+
 import httpx
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -18,8 +18,6 @@ REPORT_PATH = ROOT / "reports" / "coldstart.md"
 
 def measure_target(url: str) -> dict:
     base = url.rstrip("/")
-    start = time.perf_counter()
-
     ttfb = 0.0
     ready_time = 0.0
     first_answer_time = 0.0
@@ -28,7 +26,7 @@ def measure_target(url: str) -> dict:
         # Measure health TTFB
         t0 = time.perf_counter()
         try:
-            r = client.get("/health")
+            client.get("/health")
             ttfb = time.perf_counter() - t0
         except Exception:
             ttfb = -1.0
@@ -36,7 +34,7 @@ def measure_target(url: str) -> dict:
         # Measure /ready time
         t1 = time.perf_counter()
         try:
-            r = client.get("/ready")
+            client.get("/ready")
             ready_time = time.perf_counter() - t1
         except Exception:
             ready_time = -1.0
@@ -44,7 +42,7 @@ def measure_target(url: str) -> dict:
         # Measure /ask first answer latency
         t2 = time.perf_counter()
         try:
-            r = client.post("/ask", json={"question": "What is the capital adequacy ratio?"})
+            client.post("/ask", json={"question": "What is the capital adequacy ratio?"})
             first_answer_time = time.perf_counter() - t2
         except Exception:
             first_answer_time = -1.0

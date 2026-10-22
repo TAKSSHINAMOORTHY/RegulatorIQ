@@ -15,19 +15,16 @@ Validates:
 from __future__ import annotations
 
 import json
-import os
 import subprocess
 import sys
 import time
-from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from agent.events import validate_event_order
 from api.main import create_app
 from api.settings import APISettings
 from api.state import ServiceStage, get_app_state
-from config.paths import DOCS_DIR, EVENTS_SCHEMA, OPENAPI_PATH, STATE_FILE_PATH
+from config.paths import DOCS_DIR, OPENAPI_PATH, STATE_FILE_PATH
 
 
 def verify_phase_7() -> bool:
@@ -39,7 +36,9 @@ def verify_phase_7() -> bool:
     api_md = DOCS_DIR / "API.md"
     events_md = DOCS_DIR / "events.md"
     if not api_md.exists() or not events_md.exists() or not OPENAPI_PATH.exists():
-        print("❌ Missing contract documentation artifacts (docs/API.md, docs/events.md, docs/openapi.json)")
+        print(
+            "❌ Missing contract documentation artifacts (docs/API.md, docs/events.md, docs/openapi.json)"
+        )
         return False
     print("✅ Contract artifacts verified (docs/openapi.json, docs/events.md, docs/API.md)")
 
@@ -57,7 +56,7 @@ def verify_phase_7() -> bool:
     if bind_time_s > 2.0:
         print(f"❌ Application took too long to bind: {bind_time_s:.2f}s > 2.0s")
         return False
-    print(f"✅ Application factory bound port in {bind_time_s*1000:.1f}ms (< 2000ms)")
+    print(f"✅ Application factory bound port in {bind_time_s * 1000:.1f}ms (< 2000ms)")
 
     # 3. GET /health before engine is ready
     resp = client.get("/health")
@@ -74,6 +73,7 @@ def verify_phase_7() -> bool:
     class VerifyMockAgentRunner:
         def stream(self, question: str, **kwargs):
             from agent.events import AgentEvent
+
             yield AgentEvent(seq=1, step="plan", type="status", data={"message": "Planning"})
             yield AgentEvent(seq=2, step="ground", type="grounding", data={"supported_ratio": 1.0})
             yield AgentEvent(seq=3, step="gen", type="token", data={"text": "CRR is 4.50%."})
@@ -86,6 +86,7 @@ def verify_phase_7() -> bool:
 
         def run(self, question: str, **kwargs):
             from agent.types import RagAnswer
+
             return RagAnswer(
                 answer="CRR is 4.50%.",
                 citations=[],
@@ -135,11 +136,11 @@ def verify_phase_7() -> bool:
             continue
         ev_type = None
         ev_data = None
-        for l in frame.split("\n"):
-            if l.startswith("event: "):
-                ev_type = l[len("event: ") :]
-            elif l.startswith("data: "):
-                ev_data = json.loads(l[len("data: ") :])
+        for line_part in frame.split("\n"):
+            if line_part.startswith("event: "):
+                ev_type = line_part[len("event: ") :]
+            elif line_part.startswith("data: "):
+                ev_data = json.loads(line_part[len("data: ") :])
         if ev_type and ev_data is not None:
             events.append((ev_type, ev_data))
 

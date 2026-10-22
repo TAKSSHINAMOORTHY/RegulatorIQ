@@ -12,7 +12,7 @@ import asyncio
 import logging
 import secrets
 import time
-from typing import Any, AsyncIterator, Dict, List, Optional
+from typing import Any, AsyncIterator, Dict, Optional
 
 from fastapi import APIRouter, Depends, Header, Request, status
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -32,7 +32,7 @@ from api.errors import RateLimitExceeded, ServiceUnavailable
 from api.observability import LocalJsonlTracer, metrics_registry
 from api.ratelimit import RateLimiter
 from api.schemas import AskRequest
-from api.security import sanitize_citations, sanitize_event_data, sanitize_text
+from api.security import sanitize_citations, sanitize_text
 from api.settings import APISettings
 from api.sse import format_sse_comment, format_sse_event
 from api.state import AppState
@@ -77,7 +77,8 @@ async def ask_question(
     # 2. Engine Readiness Check
     if not state.is_ready or not state.agent_runner:
         raise ServiceUnavailable(
-            message=state.failure_hint or "Engine is bootstrapping models and index. Please retry shortly.",
+            message=state.failure_hint
+            or "Engine is bootstrapping models and index. Please retry shortly.",
             retry_after_s=5,
         )
 
@@ -103,9 +104,15 @@ async def ask_question(
     history_dicts = [h.model_dump() for h in body.history]
 
     # Non-streaming JSON mode
-    if accept and "application/json" in accept.lower() and "text/event-stream" not in accept.lower():
+    if (
+        accept
+        and "application/json" in accept.lower()
+        and "text/event-stream" not in accept.lower()
+    ):
         t0 = time.perf_counter()
-        tracer = LocalJsonlTracer(req_id, mode=state.mode.value, redact=settings.TRACE_REDACT_QUESTIONS)
+        tracer = LocalJsonlTracer(
+            req_id, mode=state.mode.value, redact=settings.TRACE_REDACT_QUESTIONS
+        )
         try:
             with tracer.span("ask_run", {"question": body.question, "opts": session_opts}):
                 ans: RagAnswer = await asyncio.wait_for(
@@ -167,8 +174,12 @@ async def ask_question(
     async def sse_stream() -> AsyncIterator[str]:
         t0 = time.perf_counter()
         seq = 1
-        index_ver = state.index_store.manifest.get("version", "unknown") if state.index_store else "unknown"
-        tracer = LocalJsonlTracer(req_id, mode=state.mode.value, redact=settings.TRACE_REDACT_QUESTIONS)
+        index_ver = (
+            state.index_store.manifest.get("version", "unknown") if state.index_store else "unknown"
+        )
+        tracer = LocalJsonlTracer(
+            req_id, mode=state.mode.value, redact=settings.TRACE_REDACT_QUESTIONS
+        )
 
         # Emit initial 'meta' event
         yield format_sse_event(
@@ -201,7 +212,7 @@ async def ask_question(
             finally:
                 loop.call_soon_threadsafe(event_queue.put_nowait, None)
 
-        worker_future = loop.run_in_executor(None, stream_worker)
+        loop.run_in_executor(None, stream_worker)
 
         first_token_seen = False
         grounding_seen = False

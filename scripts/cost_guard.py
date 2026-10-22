@@ -45,7 +45,9 @@ def audit_cost_headroom() -> dict:
     for provider, desc in quotas.items():
         print(f"  [{provider:8s}]: {desc}")
 
-    print("\n✓ Cost Guard: All active infrastructure complies with $0.00 / month free-tier constraints.")
+    print(
+        "\n✓ Cost Guard: All active infrastructure complies with $0.00 / month free-tier constraints."
+    )
     return {"status": "compliant", "estimated_monthly_cost_usd": 0.0}
 
 

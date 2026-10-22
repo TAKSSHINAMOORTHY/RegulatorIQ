@@ -4,10 +4,10 @@
   "phases": {
     "1": {
       "status": "complete",
-      "completed_at": "2026-10-22T06:50:26.209346Z",
+      "completed_at": "2026-10-22T09:44:14.914168Z",
       "commit": null,
       "artifacts": {
-        "manifest_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-38/test_generate_corpus_report0/manifest.jsonl",
+        "manifest_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-43/test_generate_corpus_report0/manifest.jsonl",
         "raw_dir": "/Users/datchu/Downloads/Projects/RBI/data/raw/rbi",
         "paths_module": "config.paths"
       },
@@ -27,12 +27,12 @@
     },
     "2": {
       "status": "complete",
-      "completed_at": "2026-10-22T06:50:26.205477Z",
+      "completed_at": "2026-10-22T09:44:14.911773Z",
       "commit": null,
       "artifacts": {
-        "documents_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-38/test_run_full_processing_smoke0/documents.parquet",
-        "chunks_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-38/test_run_full_processing_smoke0/chunks.parquet",
-        "links_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-38/test_run_full_processing_smoke0/links.parquet",
+        "documents_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-43/test_run_full_processing_smoke0/documents.parquet",
+        "chunks_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-43/test_run_full_processing_smoke0/chunks.parquet",
+        "links_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-43/test_run_full_processing_smoke0/links.parquet",
         "chunk_count": 111,
         "doc_count": 25,
         "token_stats": {
@@ -57,12 +57,12 @@
     },
     "3": {
       "status": "complete",
-      "completed_at": "2026-10-22T06:49:57.308696Z",
+      "completed_at": "2026-10-22T09:43:50.731449Z",
       "commit": null,
       "artifacts": {
-        "index_dir": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-38/test_build_index_and_package0/artifacts/index/2.1.0-fake-f05c293a",
+        "index_dir": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-43/test_build_index_and_package0/artifacts/index/2.1.0-fake-f05c293a",
         "index_version": "2.1.0-fake-f05c293a",
-        "pointer_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-38/test_build_index_and_package0/artifacts/index/CURRENT",
+        "pointer_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-43/test_build_index_and_package0/artifacts/index/CURRENT",
         "embedder": {
           "name": "fake",
           "dim": 384,
@@ -71,10 +71,10 @@
         "vector_backend": "faiss",
         "quantisation": "fp16",
         "total_bytes": 39848,
-        "load_seconds": 0.008,
+        "load_seconds": 0.007,
         "p95_latency_ms": {
-          "dense": 0.18723109969869245,
-          "bm25": 0.5007227995520224
+          "dense": 0.1546099003462586,
+          "bm25": 0.22223330124688795
         },
         "chunk_count": 12,
         "doc_count": 6,
@@ -450,7 +450,7 @@
     },
     "7": {
       "status": "completed",
-      "completed_at": "2026-10-22T08:42:39Z",
+      "completed_at": "2026-10-22T09:49:01Z",
       "artifacts": {
         "api_entrypoint": "api.main:app",
         "openapi_path": "docs/openapi.json",
@@ -517,7 +517,7 @@
     },
     "9": {
       "status": "complete",
-      "completed_at": "2026-10-22T09:27:45.378755+00:00",
+      "completed_at": "2026-10-22T09:49:09.045584+00:00",
       "artifacts": {
         "image": {
           "ref": "ghcr.io/taksshinamoorthy/regulatoriq-api:latest",
@@ -588,6 +588,28 @@
         "runbook_path": "docs/RUNBOOK.md",
         "release_gate_command": "make release-gate",
         "docker_unverified": true,
+        "degraded_reasons": [
+          "Host environment lacks local docker daemon; verified via static checks, unit tests, and GitHub Actions CI."
+        ]
+      }
+    },
+    "10": {
+      "status": "complete",
+      "completed_at": "2026-10-22T09:49:11.077464+00:00",
+      "artifacts": {
+        "final_report_path": "reports/FINAL_REPORT.md",
+        "all_phases_verified": true,
+        "claims_audited": true,
+        "test_matrix_passed": true,
+        "pending_items": [
+          "deploy/PENDING_oracle.md",
+          "deploy/PENDING_cloudrun.md",
+          "deploy/PENDING_hfspace.md",
+          "deploy/PENDING_aws.md",
+          "deploy/PENDING_light.md",
+          "deploy/PENDING_vercel.md",
+          "deploy/PENDING_github.md"
+        ],
         "degraded_reasons": [
           "Host environment lacks local docker daemon; verified via static checks, unit tests, and GitHub Actions CI."
         ]

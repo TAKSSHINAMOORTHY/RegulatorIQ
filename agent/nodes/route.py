@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Optional
 
 from agent.llm import LLM, ExtractiveLLMProvider
 from agent.state import AgentState
 from agent.tracing import Tracer
 from retrieval.query_analysis import QueryAnalyzer
-
 
 CHITCHAT_PATTERNS = {
     "hi",
@@ -44,7 +43,16 @@ def node_route(
             words_count <= 5
             and any(
                 p in clean_q
-                for p in ("hi", "hello", "hey", "good morning", "good afternoon", "thanks", "thank you", "bye")
+                for p in (
+                    "hi",
+                    "hello",
+                    "hey",
+                    "good morning",
+                    "good afternoon",
+                    "thanks",
+                    "thank you",
+                    "bye",
+                )
             )
         )
         if is_chat:
@@ -54,15 +62,32 @@ def node_route(
             return state
 
         # 2. FULL mode LLM route (if enabled and non-extractive)
-        if state.mode == "full" and llm is not None and not isinstance(llm.provider, ExtractiveLLMProvider):
-            prompt = prompt_template.replace("{history}", str(state.history[-2:])).replace("{question}", state.standalone_question or state.question)
+        if (
+            state.mode == "full"
+            and llm is not None
+            and not isinstance(llm.provider, ExtractiveLLMProvider)
+        ):
+            prompt = prompt_template.replace("{history}", str(state.history[-2:])).replace(
+                "{question}", state.standalone_question or state.question
+            )
             try:
                 res = llm.generate([{"role": "user", "content": prompt}], max_tokens=60)
                 state.budget.llm_calls_used += 1
                 state.budget.tokens_used += res.usage.get("total", 0)
                 parsed = res.parsed_json or {}
                 intent = parsed.get("intent", "").lower()
-                valid_intents = {"lookup", "definition", "threshold", "timeline", "comparison", "applicability", "validity", "procedure", "chitchat", "out_of_scope"}
+                valid_intents = {
+                    "lookup",
+                    "definition",
+                    "threshold",
+                    "timeline",
+                    "comparison",
+                    "applicability",
+                    "validity",
+                    "procedure",
+                    "chitchat",
+                    "out_of_scope",
+                }
                 if intent in valid_intents:
                     state.intent = intent
                     span["intent"] = intent

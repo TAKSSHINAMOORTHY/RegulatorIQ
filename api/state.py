@@ -40,7 +40,9 @@ class AppState:
         self.started_at_utc = datetime.now(timezone.utc).isoformat()
         self.start_perf_time = time.perf_counter()
         self.current_stage: ServiceStage = ServiceStage.STARTING
-        self.stage_timestamps: Dict[str, float] = {ServiceStage.STARTING.value: self.start_perf_time}
+        self.stage_timestamps: Dict[str, float] = {
+            ServiceStage.STARTING.value: self.start_perf_time
+        }
         self.stage_durations: Dict[str, float] = {}
 
         # Mode & Fallback tracking
@@ -108,7 +110,9 @@ class AppState:
         if reason and reason not in self.degraded_reasons:
             self.degraded_reasons.append(reason)
             self.degraded_notice = "; ".join(self.degraded_reasons)
-        logger.info(f"Operating mode transition: {old_mode.value} -> {mode.value} (reason={reason})")
+        logger.info(
+            f"Operating mode transition: {old_mode.value} -> {mode.value} (reason={reason})"
+        )
 
     def register_provider_failure(self, error_str: str) -> None:
         """Track consecutive provider failures; downgrade to RULES on threshold."""
@@ -126,9 +130,15 @@ class AppState:
             # Check if budget is not exhausted
             if self.budget_guard and not self.budget_guard.is_exhausted:
                 self.mode = ServiceMode.FULL
-                self.degraded_reasons = [r for r in self.degraded_reasons if "LLM provider failed" not in r]
-                self.degraded_notice = "; ".join(self.degraded_reasons) if self.degraded_reasons else None
-                logger.info("Operating mode restored to FULL following successful provider operation")
+                self.degraded_reasons = [
+                    r for r in self.degraded_reasons if "LLM provider failed" not in r
+                ]
+                self.degraded_notice = (
+                    "; ".join(self.degraded_reasons) if self.degraded_reasons else None
+                )
+                logger.info(
+                    "Operating mode restored to FULL following successful provider operation"
+                )
 
     def get_corpus_stats(self) -> Dict[str, Any]:
         """Fetch indexed corpus statistics from active index_store."""

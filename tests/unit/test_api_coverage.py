@@ -1,54 +1,45 @@
 """Targeted tests to ensure >=85% test coverage across api/ modules."""
 
 import asyncio
-import io
 import json
 import sqlite3
-import sys
-import tarfile
 import tempfile
-import time
 import zipfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi import Request
-from starlette.datastructures import Headers
 
-from agent.events import AgentEvent
-from agent.types import RagAnswer
-from api.deps import get_request_client_ip, verify_api_key
+from api.deps import verify_api_key
 from api.errors import (
-    APIError,
     PayloadTooLarge,
     RateLimitExceeded,
     ServiceUnavailable,
     api_error_handler,
-    http_exception_handler,
     unhandled_exception_handler,
-    validation_exception_handler,
 )
 from api.feedback_store import FeedbackStore
 from api.index_fetch import (
     compute_file_sha256,
-    download_with_resume,
     fetch_index_archive,
-    main as index_fetch_main,
     safe_extract_archive,
 )
-from api.lifespan import bootstrap_engine, lifespan
+from api.index_fetch import (
+    main as index_fetch_main,
+)
+from api.lifespan import bootstrap_engine
 from api.observability import LocalJsonlTracer, SimpleMetricsRegistry
-from api.preflight import main as preflight_main, run_preflight
+from api.preflight import main as preflight_main
+from api.preflight import run_preflight
 from api.routes.warmup import execute_warmup
-from api.schemas import AskRequest, FeedbackRequest
+from api.schemas import FeedbackRequest
 from api.security import (
     BodySizeLimiterMiddleware,
     SecurityHeadersMiddleware,
-    sanitize_event_data,
 )
 from api.settings import APISettings
-from api.sse import format_sse_comment, format_sse_event, sse_event_stream_generator
+from api.sse import sse_event_stream_generator
 from api.state import AppState, ServiceMode, ServiceStage
 
 
@@ -59,7 +50,9 @@ def test_feedback_store_all_backends():
         # 1. JSONL sink
         jsonl_path = tmp / "fb.jsonl"
         store_jsonl = FeedbackStore(sink_type="jsonl", file_path=jsonl_path)
-        req = FeedbackRequest(request_id="12345678-1234-5678-1234-567812345678", rating="up", comment="Great")
+        req = FeedbackRequest(
+            request_id="12345678-1234-5678-1234-567812345678", rating="up", comment="Great"
+        )
         store_jsonl.save_feedback(req, client_hash="abc")
         assert jsonl_path.exists()
 
@@ -201,17 +194,18 @@ async def test_lifespan_bootstrap_flow():
     settings = APISettings(ENV="test", RAG_LIGHT_MODE=1, LLM_PROVIDER="rules")
 
     # Mock IndexStore and Retriever
-    with patch("api.lifespan.IndexStore") as mock_store_cls, \
-         patch("api.lifespan.Retriever") as mock_retriever_cls, \
-         patch("api.lifespan.AgentRunner") as mock_runner_cls:
-        
+    with (
+        patch("api.lifespan.IndexStore") as mock_store_cls,
+        patch("api.lifespan.Retriever") as mock_retriever_cls,
+        patch("api.lifespan.AgentRunner") as mock_runner_cls,
+    ):
         mock_store = MagicMock()
         mock_store.verify.return_value = (True, "OK")
         mock_store_cls.return_value = mock_store
-        
+
         mock_retriever = MagicMock()
         mock_retriever_cls.from_config.return_value = mock_retriever
-        
+
         mock_runner = MagicMock()
         mock_runner_cls.from_config.return_value = mock_runner
 
@@ -236,16 +230,19 @@ def test_security_headers_https_forwarded():
     settings = APISettings(ENV="test", TRUSTED_PROXIES="10.0.0.1")
     middleware = SecurityHeadersMiddleware(app, settings)
 
-    req = Request({
-        "type": "http",
-        "method": "GET",
-        "path": "/health",
-        "headers": [(b"x-forwarded-proto", b"https")],
-        "client": ("10.0.0.1", 12345),
-    })
+    req = Request(
+        {
+            "type": "http",
+            "method": "GET",
+            "path": "/health",
+            "headers": [(b"x-forwarded-proto", b"https")],
+            "client": ("10.0.0.1", 12345),
+        }
+    )
 
     async def call_next(r):
         from starlette.responses import Response
+
         return Response("ok")
 
     resp = asyncio.run(middleware.dispatch(req, call_next))
@@ -257,16 +254,19 @@ async def test_body_size_limiter_exceeded():
     app = MagicMock()
     middleware = BodySizeLimiterMiddleware(app, max_bytes=100)
 
-    req = Request({
-        "type": "http",
-        "method": "POST",
-        "path": "/ask",
-        "headers": [(b"content-length", b"200")],
-    })
+    req = Request(
+        {
+            "type": "http",
+            "method": "POST",
+            "path": "/ask",
+            "headers": [(b"content-length", b"200")],
+        }
+    )
     req.state.request_id = "req-too-large"
 
     async def call_next(r):
         from starlette.responses import Response
+
         return Response("ok")
 
     resp = await middleware.dispatch(req, call_next)
@@ -291,27 +291,32 @@ def test_api_key_auth_verification():
 
 def test_ratelimit_get_client_ip_trusted_proxy():
     from api.ratelimit import RateLimiter
+
     limiter = RateLimiter(trusted_proxies={"10.0.0.1"})
 
     # Direct client from untrusted proxy
-    req_direct = Request({
-        "type": "http",
-        "method": "GET",
-        "path": "/",
-        "headers": [(b"x-forwarded-for", b"203.0.113.195")],
-        "client": ("192.168.1.1", 1234),
-    })
+    req_direct = Request(
+        {
+            "type": "http",
+            "method": "GET",
+            "path": "/",
+            "headers": [(b"x-forwarded-for", b"203.0.113.195")],
+            "client": ("192.168.1.1", 1234),
+        }
+    )
     # Since 192.168.1.1 is NOT trusted, x-forwarded-for is ignored
     assert limiter.get_client_ip(req_direct) == "192.168.1.1"
 
     # Client behind trusted proxy 10.0.0.1
-    req_trusted = Request({
-        "type": "http",
-        "method": "GET",
-        "path": "/",
-        "headers": [(b"x-forwarded-for", b"203.0.113.195, 10.0.0.1")],
-        "client": ("10.0.0.1", 1234),
-    })
+    req_trusted = Request(
+        {
+            "type": "http",
+            "method": "GET",
+            "path": "/",
+            "headers": [(b"x-forwarded-for", b"203.0.113.195, 10.0.0.1")],
+            "client": ("10.0.0.1", 1234),
+        }
+    )
     assert limiter.get_client_ip(req_trusted) == "203.0.113.195"
 
 
@@ -321,9 +326,11 @@ def test_index_fetch_mock_flow():
         target = tmp / "target_index"
 
         # Mock download_with_resume
-        with patch("api.index_fetch.download_with_resume") as mock_dl, \
-             patch("api.index_fetch.safe_extract_archive") as mock_extract:
-            
+        with (
+            patch("api.index_fetch.download_with_resume"),
+            patch("api.index_fetch.safe_extract_archive") as mock_extract,
+        ):
+
             def create_fake_manifest(archive, extract_dir):
                 m_dir = extract_dir / "index"
                 m_dir.mkdir(parents=True, exist_ok=True)
@@ -340,6 +347,7 @@ def test_index_fetch_mock_flow():
 
 def test_feedback_rate_limit_rejection():
     from fastapi import HTTPException
+
     from api.routes.feedback import submit_feedback
 
     mock_limiter = MagicMock()
@@ -356,6 +364,7 @@ def test_feedback_rate_limit_rejection():
 
 def test_ready_route_with_populated_store():
     from starlette.responses import Response
+
     from api.routes.ready import get_ready
 
     st = AppState()
@@ -377,18 +386,21 @@ def test_cli_entrypoints():
             preflight_main()
         assert exc.value.code in (0, 78)
 
-    with patch("sys.argv", ["index_fetch", "--url", "https://example.com/test.zip"]), \
-         patch("api.index_fetch.fetch_index_archive", return_value=True):
+    with (
+        patch("sys.argv", ["index_fetch", "--url", "https://example.com/test.zip"]),
+        patch("api.index_fetch.fetch_index_archive", return_value=True),
+    ):
         with pytest.raises(SystemExit) as exc:
             index_fetch_main()
         assert exc.value.code == 0
 
 
 def test_ask_route_branches():
-    from tests.unit.test_api_routes import MockAgentRunner
+    from fastapi.testclient import TestClient
+
     from api.main import create_app
     from api.state import get_app_state
-    from fastapi.testclient import TestClient
+    from tests.unit.test_api_routes import MockAgentRunner
 
     settings = APISettings(ENV="test", API_KEYS="")
     app = create_app(settings)
@@ -419,11 +431,12 @@ def test_ask_route_branches():
 
 
 def test_coverage_gap_fillers():
+    from starlette.responses import Response
+
     from api.budget import GlobalBudgetGuard
+    from api.preflight import run_preflight
     from api.routes.meta import get_metadata
     from api.routes.version import get_version
-    from api.preflight import run_preflight
-    from starlette.responses import Response
 
     st = AppState()
     st.index_store = None
@@ -442,8 +455,3 @@ def test_coverage_gap_fillers():
         mock_set.side_effect = RuntimeError("Bad settings")
         rep = run_preflight()
         assert rep["status"] == "error"
-
-
-
-
-

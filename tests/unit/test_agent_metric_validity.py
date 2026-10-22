@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import pytest
+from dataclasses import dataclass
 
 from agent.selfcheck import SelfChecker
-from dataclasses import dataclass
+
 
 @dataclass
 class MockChunk:

@@ -14,7 +14,7 @@ Defines exact Prompt 5 ablation systems:
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional
 
 from agent.types import RagAnswer
 from config.paths import RETRIEVAL_CONFIG
@@ -331,7 +331,9 @@ register_system(
 register_system("rag_best", lambda **kw: get_system("hybrid_rerank_context", **kw))
 
 
-def _build_agent_system(cap_overrides: Dict[str, bool], forced_mode: Optional[str] = None, **kwargs: Any) -> Any:
+def _build_agent_system(
+    cap_overrides: Dict[str, bool], forced_mode: Optional[str] = None, **kwargs: Any
+) -> Any:
     """Builder for agentic systems with customizable capability toggles."""
     from agent.runner import AgentRunner
 
@@ -390,7 +392,15 @@ register_system(
 register_system(
     "agent_ladder_router",
     lambda **kw: _build_agent_system(
-        cap_overrides={"router": True, "decompose": False, "grade_retry": False, "validity": False, "xref": False, "selfcheck": False, "clarify": False},
+        cap_overrides={
+            "router": True,
+            "decompose": False,
+            "grade_retry": False,
+            "validity": False,
+            "xref": False,
+            "selfcheck": False,
+            "clarify": False,
+        },
         **kw,
     ),
 )
@@ -399,7 +409,15 @@ register_system(
 register_system(
     "agent_ladder_grade",
     lambda **kw: _build_agent_system(
-        cap_overrides={"router": True, "decompose": False, "grade_retry": True, "validity": False, "xref": False, "selfcheck": False, "clarify": False},
+        cap_overrides={
+            "router": True,
+            "decompose": False,
+            "grade_retry": True,
+            "validity": False,
+            "xref": False,
+            "selfcheck": False,
+            "clarify": False,
+        },
         **kw,
     ),
 )
@@ -408,7 +426,15 @@ register_system(
 register_system(
     "agent_ladder_decompose",
     lambda **kw: _build_agent_system(
-        cap_overrides={"router": True, "decompose": True, "grade_retry": True, "validity": False, "xref": False, "selfcheck": False, "clarify": False},
+        cap_overrides={
+            "router": True,
+            "decompose": True,
+            "grade_retry": True,
+            "validity": False,
+            "xref": False,
+            "selfcheck": False,
+            "clarify": False,
+        },
         **kw,
     ),
 )
@@ -417,7 +443,15 @@ register_system(
 register_system(
     "agent_ladder_validity",
     lambda **kw: _build_agent_system(
-        cap_overrides={"router": True, "decompose": True, "grade_retry": True, "validity": True, "xref": False, "selfcheck": False, "clarify": False},
+        cap_overrides={
+            "router": True,
+            "decompose": True,
+            "grade_retry": True,
+            "validity": True,
+            "xref": False,
+            "selfcheck": False,
+            "clarify": False,
+        },
         **kw,
     ),
 )
@@ -426,7 +460,15 @@ register_system(
 register_system(
     "agent_ladder_xref",
     lambda **kw: _build_agent_system(
-        cap_overrides={"router": True, "decompose": True, "grade_retry": True, "validity": True, "xref": True, "selfcheck": False, "clarify": False},
+        cap_overrides={
+            "router": True,
+            "decompose": True,
+            "grade_retry": True,
+            "validity": True,
+            "xref": True,
+            "selfcheck": False,
+            "clarify": False,
+        },
         **kw,
     ),
 )
@@ -435,7 +477,15 @@ register_system(
 register_system(
     "agent_ladder_selfcheck",
     lambda **kw: _build_agent_system(
-        cap_overrides={"router": True, "decompose": True, "grade_retry": True, "validity": True, "xref": True, "selfcheck": True, "clarify": False},
+        cap_overrides={
+            "router": True,
+            "decompose": True,
+            "grade_retry": True,
+            "validity": True,
+            "xref": True,
+            "selfcheck": True,
+            "clarify": False,
+        },
         **kw,
     ),
 )
@@ -444,8 +494,15 @@ register_system(
 register_system(
     "agent_ladder_clarify",
     lambda **kw: _build_agent_system(
-        cap_overrides={"router": True, "decompose": True, "grade_retry": True, "validity": True, "xref": True, "selfcheck": True, "clarify": True},
+        cap_overrides={
+            "router": True,
+            "decompose": True,
+            "grade_retry": True,
+            "validity": True,
+            "xref": True,
+            "selfcheck": True,
+            "clarify": True,
+        },
         **kw,
     ),
 )
-

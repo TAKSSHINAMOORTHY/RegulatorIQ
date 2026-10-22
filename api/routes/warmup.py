@@ -74,7 +74,11 @@ def execute_warmup(
 
         # 3. Warm cross-encoder reranker if not in light mode
         t0 = time.perf_counter()
-        if state.mode != ServiceMode.LIGHT and hasattr(retriever, "reranker") and retriever.reranker:
+        if (
+            state.mode != ServiceMode.LIGHT
+            and hasattr(retriever, "reranker")
+            and retriever.reranker
+        ):
             try:
                 pairs = [(fixed_query, c.get("text", "")) for c in retrieved_chunks[:8]]
                 if pairs:

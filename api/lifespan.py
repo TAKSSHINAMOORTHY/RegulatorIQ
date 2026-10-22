@@ -65,7 +65,9 @@ async def bootstrap_engine(app_state: AppState, settings: APISettings) -> None:
         store = await asyncio.to_thread(IndexStore, index_dir)
         valid, msg = store.verify(mode="fast")
         if not valid:
-            app_state.transition_to(ServiceStage.FAILED, hint=f"IndexStore verification failed: {msg}")
+            app_state.transition_to(
+                ServiceStage.FAILED, hint=f"IndexStore verification failed: {msg}"
+            )
             return
         app_state.index_store = store
 
@@ -88,8 +90,12 @@ async def bootstrap_engine(app_state: AppState, settings: APISettings) -> None:
             try:
                 llm = LLM()
             except Exception as e:
-                logger.warning(f"Could not initialize LLM provider '{provider_name}': {e}. Falling back to rules.")
-                app_state.degraded_reasons.append(f"LLM provider '{provider_name}' unavailable: {e}")
+                logger.warning(
+                    f"Could not initialize LLM provider '{provider_name}': {e}. Falling back to rules."
+                )
+                app_state.degraded_reasons.append(
+                    f"LLM provider '{provider_name}' unavailable: {e}"
+                )
 
         # Mode determination
         if is_light:
@@ -116,14 +122,18 @@ async def bootstrap_engine(app_state: AppState, settings: APISettings) -> None:
         logger.info("Executing internal warm query (no LLM)...")
         try:
             # Touch retriever with a single query
-            await asyncio.to_thread(retriever.retrieve, "Reserve Bank of India Master Directions", top_k=3)
+            await asyncio.to_thread(
+                retriever.retrieve, "Reserve Bank of India Master Directions", top_k=3
+            )
         except Exception as e:
             logger.warning(f"Warmup query encountered minor issue: {e}")
 
         # 5. Transition to READY or DEGRADED
         final_stage = ServiceStage.DEGRADED if app_state.degraded_reasons else ServiceStage.READY
         app_state.transition_to(final_stage)
-        logger.info(f"Engine bootstrap completed successfully! Service is now {final_stage.value.upper()}.")
+        logger.info(
+            f"Engine bootstrap completed successfully! Service is now {final_stage.value.upper()}."
+        )
 
     except Exception as e:
         logger.exception(f"Unexpected error during engine bootstrap: {e}")

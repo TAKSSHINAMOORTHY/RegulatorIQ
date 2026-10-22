@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import json
 import sys
-from typing import Any, Dict, List
+from typing import Any, List
 
 import yaml
 
@@ -67,7 +67,9 @@ def verify_phase_6() -> bool:
         if ans.steps > 14:
             print(f"❌ Graph execution exceeded max steps: got {ans.steps}")
             return False
-        print(f"✅ AgentRunner returned valid RagAnswer (steps={ans.steps}, provider={ans.provider}, citations={len(ans.citations)})")
+        print(
+            f"✅ AgentRunner returned valid RagAnswer (steps={ans.steps}, provider={ans.provider}, citations={len(ans.citations)})"
+        )
     except Exception as e:
         print(f"❌ AgentRunner execution failed: {e}")
         return False
@@ -77,6 +79,7 @@ def verify_phase_6() -> bool:
     try:
         with open(EVENTS_SCHEMA, "r", encoding="utf-8") as f:
             schema = json.load(f)
+            assert isinstance(schema, dict) and len(schema) > 0
 
         events: List[Any] = []
         for ev in runner.stream("What are statutory liquidity ratio rules?"):
@@ -159,7 +162,9 @@ def verify_phase_6() -> bool:
         st = json.load(f)
     p6_state = st.get("phases", {}).get("6", {})
     if p6_state.get("status") != "complete":
-        print(f"❌ STATE.json phases['6']['status'] is '{p6_state.get('status')}', expected 'complete'")
+        print(
+            f"❌ STATE.json phases['6']['status'] is '{p6_state.get('status')}', expected 'complete'"
+        )
         return False
     print("✅ docs/STATE.json Phase 6 marked complete")
 

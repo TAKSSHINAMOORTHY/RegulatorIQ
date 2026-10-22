@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from datetime import date
-from typing import Any, Dict, List, Literal, Optional
+from typing import Dict, List, Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -31,10 +31,18 @@ class AskOptions(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    as_of: Optional[date] = Field(default=None, description="Regulatory point-in-time date constraint (YYYY-MM-DD)")
-    doc_types: Optional[List[str]] = Field(default=None, description="Filter documents by category/type")
-    include_superseded: bool = Field(default=False, description="Whether to include superseded documents")
-    interactive: bool = Field(default=True, description="Allow clarification request vs emit assumption")
+    as_of: Optional[date] = Field(
+        default=None, description="Regulatory point-in-time date constraint (YYYY-MM-DD)"
+    )
+    doc_types: Optional[List[str]] = Field(
+        default=None, description="Filter documents by category/type"
+    )
+    include_superseded: bool = Field(
+        default=False, description="Whether to include superseded documents"
+    )
+    interactive: bool = Field(
+        default=True, description="Allow clarification request vs emit assumption"
+    )
 
 
 class ConversationTurn(BaseModel):
@@ -60,8 +68,14 @@ class AskRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     question: str = Field(..., min_length=1, max_length=1000, description="Regulatory question")
-    history: List[ConversationTurn] = Field(default_factory=list, max_length=8, description="Recent conversation turns (max 4 round-trips)")
-    options: AskOptions = Field(default_factory=AskOptions, description="Search and generation options")
+    history: List[ConversationTurn] = Field(
+        default_factory=list,
+        max_length=8,
+        description="Recent conversation turns (max 4 round-trips)",
+    )
+    options: AskOptions = Field(
+        default_factory=AskOptions, description="Search and generation options"
+    )
 
     @field_validator("question")
     @classmethod
@@ -79,10 +93,12 @@ class FeedbackRequest(BaseModel):
 
     request_id: str = Field(..., description="UUID of the /ask request being rated")
     rating: Literal["up", "down"] = Field(..., description="User rating")
-    reason: Optional[Literal["wrong_fact", "outdated", "missing_citation", "unhelpful", "other"]] = Field(
-        default=None, description="Category reason for rating"
+    reason: Optional[
+        Literal["wrong_fact", "outdated", "missing_citation", "unhelpful", "other"]
+    ] = Field(default=None, description="Category reason for rating")
+    comment: Optional[str] = Field(
+        default=None, max_length=500, description="Optional user comment"
     )
-    comment: Optional[str] = Field(default=None, max_length=500, description="Optional user comment")
 
     @field_validator("request_id")
     @classmethod

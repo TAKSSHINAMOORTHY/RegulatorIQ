@@ -10,7 +10,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, Optional
 
-from fastapi import HTTPException, Request, status
+from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -136,7 +136,9 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException) 
     )
 
 
-async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+async def validation_exception_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
     """Handle request validation errors without echoing user input."""
     req_id = getattr(request.state, "request_id", "unknown")
     errors_summary = []
@@ -144,7 +146,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         loc = ".".join(str(p) for p in err.get("loc", []))
         msg = err.get("msg", "Invalid value")
         errors_summary.append(f"{loc}: {msg}" if loc else msg)
-    summary_text = "; ".join(errors_summary) if errors_summary else "Request payload validation failed."
+    summary_text = (
+        "; ".join(errors_summary) if errors_summary else "Request payload validation failed."
+    )
     return make_error_response(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         error="validation_error",

@@ -11,7 +11,7 @@ import logging
 import threading
 import time
 from datetime import datetime, timezone
-from typing import Callable, Dict, Optional, Set, Tuple
+from typing import Callable, Optional, Set, Tuple
 
 from starlette.requests import Request
 
@@ -145,7 +145,9 @@ class RateLimiter:
             if client_ip not in self.ask_buckets:
                 self._evict_lru(self.ask_buckets)
                 rate_sec = max(0.01, self.ask_rpm / 60.0)
-                self.ask_buckets[client_ip] = TokenBucket(rate_sec, float(self.ask_burst), self.time_fn)
+                self.ask_buckets[client_ip] = TokenBucket(
+                    rate_sec, float(self.ask_burst), self.time_fn
+                )
             else:
                 self.ask_buckets.move_to_end(client_ip)
 

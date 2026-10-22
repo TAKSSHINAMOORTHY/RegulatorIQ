@@ -4,12 +4,9 @@ from __future__ import annotations
 
 import json
 import os
-import shutil
-import tempfile
-import time
+import urllib.error
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-import urllib.error
 
 import pytest
 import yaml
@@ -20,8 +17,7 @@ from scripts.cost_guard import audit_cost_headroom
 from scripts.deploy import detect_available_targets, plan_deployment, run_deployment
 from scripts.gen_token import generate_secret
 from scripts.smoke import is_allowed_rbi_url
-from scripts.warmup import check_daily_cap, load_warmup_history, record_warmup_run, warmup_target
-
+from scripts.warmup import check_daily_cap, record_warmup_run, warmup_target
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 
@@ -107,7 +103,9 @@ class TestIndexDeliveryMode:
             (2 * 1024 * 1024 * 1024, 700 * 1024 * 1024, "fetched"),
         ],
     )
-    def test_delivery_mode_selection(self, total_bytes: int, bake_max_bytes: int, expected_mode: str):
+    def test_delivery_mode_selection(
+        self, total_bytes: int, bake_max_bytes: int, expected_mode: str
+    ):
         mode = "baked" if total_bytes <= bake_max_bytes else "fetched"
         assert mode == expected_mode
 
@@ -155,16 +153,19 @@ class TestDeployOrchestrator:
         assert plan[1]["mode"] == "light"
 
     def test_deploy_dry_run_vs_apply(self, tmp_path):
-        with patch("scripts.deploy.DEPLOYMENTS_FILE", tmp_path / "deployments.json"), patch(
-            "scripts.deploy.REPORT_PATH", tmp_path / "deploy_report.md"
+        with (
+            patch("scripts.deploy.DEPLOYMENTS_FILE", tmp_path / "deployments.json"),
+            patch("scripts.deploy.REPORT_PATH", tmp_path / "deploy_report.md"),
         ):
             # Dry run should not create deployments.json
             res = run_deployment(["local"], apply=False)
+            assert "deployments" in res
             assert not (tmp_path / "deployments.json").exists()
             assert (tmp_path / "deploy_report.md").exists()
 
             # Apply run creates deployments.json
             res_apply = run_deployment(["local"], apply=True)
+            assert "deployments" in res_apply
             assert (tmp_path / "deployments.json").exists()
             saved = json.loads((tmp_path / "deployments.json").read_text(encoding="utf-8"))
             assert any(d["target"] == "local" for d in saved)
@@ -196,7 +197,9 @@ class TestWarmupLogic:
     def test_warmup_target_success(self):
         mock_resp = MagicMock()
         mock_resp.status = 200
-        mock_resp.read.return_value = json.dumps({"warmup_time_ms": 42.0, "status": "warmed"}).encode("utf-8")
+        mock_resp.read.return_value = json.dumps(
+            {"warmup_time_ms": 42.0, "status": "warmed"}
+        ).encode("utf-8")
         mock_resp.__enter__.return_value = mock_resp
 
         with patch("urllib.request.urlopen", return_value=mock_resp):

@@ -20,7 +20,7 @@ from __future__ import annotations
 import copy
 import json
 import time
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import yaml
@@ -60,7 +60,7 @@ def load_eval_weights() -> Dict[str, float]:
     if weights_path.exists():
         with open(weights_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
-            return data.get("weights", {})
+            return dict(data.get("weights", {}))
     return {
         "faithfulness": 0.30,
         "answer_correctness": 0.25,
@@ -90,7 +90,7 @@ def evaluate_agent_on_dev(
         query = q["question"]
         as_of = q.get("as_of")
         opts = {"as_of": as_of} if as_of else None
-        
+
         ans = runner.run(query, session_opts=opts)
         lat = (time.perf_counter() - t0) * 1000.0
         latencies.append(lat)
@@ -118,12 +118,18 @@ def evaluate_agent_on_dev(
             faith, _ = compute_faithfulness(ans.answer, [c.get("text", "") for c in ans.retrieved])
             faithfulness_scores.append(faith)
 
-            keys = q.get("answer_keys") or ([gold_answer] if isinstance(gold_answer, str) else gold_answer)
+            keys = q.get("answer_keys") or (
+                [gold_answer] if isinstance(gold_answer, str) else gold_answer
+            )
             corr = compute_answer_correctness(ans.answer, keys)
             correctness_scores.append(corr)
 
-            cited_ids = [c.get("chunk_id") if isinstance(c, dict) else str(c) for c in ans.citations]
-            gold_ids = [g.get("chunk_id") if isinstance(g, dict) else str(g) for g in gold_chunks]
+            cited_ids: List[str] = [
+                str(c.get("chunk_id")) if isinstance(c, dict) else str(c) for c in ans.citations
+            ]
+            gold_ids: List[str] = [
+                str(g.get("chunk_id")) if isinstance(g, dict) else str(g) for g in gold_chunks
+            ]
             cit_p, _ = compute_citation_metrics(cited_ids, gold_ids)
             precisions.append(cit_p)
         else:
@@ -137,13 +143,15 @@ def evaluate_agent_on_dev(
     avg_prec = float(np.mean(precisions)) if precisions else 0.0
     avg_ref = float(np.mean(refusal_accs)) if refusal_accs else 1.0
 
-    overall = compute_overall_score({
-        "faithfulness": avg_faith,
-        "answer_correctness": avg_corr,
-        "recall_at_5": avg_rec,
-        "citation_precision": avg_prec,
-        "refusal_accuracy": avg_ref,
-    })
+    overall = compute_overall_score(
+        {
+            "faithfulness": avg_faith,
+            "answer_correctness": avg_corr,
+            "recall_at_5": avg_rec,
+            "citation_precision": avg_prec,
+            "refusal_accuracy": avg_ref,
+        }
+    )
 
     fr_rate = (sum(false_refusals) / ans_count) if ans_count > 0 else 0.0
     p95_lat = float(np.percentile(latencies, 95)) / 1000.0 if latencies else 0.0
@@ -194,7 +202,9 @@ def run_agent_tuning() -> Dict[str, Any]:
     num_folds = 5
     fold_size = len(dev_questions) // num_folds
 
-    for i, (refusal_t, clarify_t, grade_t, min_rel, hops, max_docs) in enumerate(candidate_grid, start=1):
+    for i, (refusal_t, clarify_t, grade_t, min_rel, hops, max_docs) in enumerate(
+        candidate_grid, start=1
+    ):
         fold_scores = []
         fold_frs = []
         fold_lats = []
@@ -239,7 +249,9 @@ def run_agent_tuning() -> Dict[str, Any]:
             "constraint_satisfied": (mean_fr <= 0.10 and p95_lat <= 25.0),
         }
         trials_log.append(trial_record)
-        print(f"Trial {i}: score={mean_score:.4f}, FR={mean_fr:.4f}, p95={p95_lat:.2f}s | valid={trial_record['constraint_satisfied']}")
+        print(
+            f"Trial {i}: score={mean_score:.4f}, FR={mean_fr:.4f}, p95={p95_lat:.2f}s | valid={trial_record['constraint_satisfied']}"
+        )
 
         if trial_record["constraint_satisfied"] and mean_score > best_score:
             best_score = mean_score

@@ -15,16 +15,16 @@ Exit codes:
 
 from __future__ import annotations
 
+import importlib
 import json
 import logging
-import os
 import shutil
 import socket
 import sys
 from pathlib import Path
 from typing import Any, Dict
 
-from api.settings import APISettings, get_settings
+from api.settings import get_settings
 from retrieval.index_store import IndexStore
 
 logger = logging.getLogger("regulatoriq.preflight")
@@ -64,7 +64,9 @@ def run_preflight() -> Dict[str, Any]:
         report["checks"]["port_bind"] = "passed"
     else:
         report["status"] = "error"
-        report["errors"].append(f"Port {settings.PORT} on host {settings.HOST} is already in use or cannot be bound.")
+        report["errors"].append(
+            f"Port {settings.PORT} on host {settings.HOST} is already in use or cannot be bound."
+        )
 
     # 3. Disk & Memory check
     disk_usage = shutil.disk_usage(".")
@@ -93,17 +95,17 @@ def run_preflight() -> Dict[str, Any]:
     else:
         if settings.INDEX_URL:
             report["checks"]["index_manifest"] = "pending_fetch"
-            report["warnings"].append("Index not found locally; remote INDEX_URL configured for automatic fetch.")
+            report["warnings"].append(
+                "Index not found locally; remote INDEX_URL configured for automatic fetch."
+            )
         else:
             report["status"] = "error"
             report["errors"].append(f"Index not found at {index_path} and INDEX_URL is not set.")
 
     # 5. Core model imports
     try:
-        import selectolax
-        import bs4
-        import pydantic
-        import fastapi
+        for mod in ("bs4", "fastapi", "pydantic", "selectolax"):
+            importlib.import_module(mod)
         report["checks"]["core_imports"] = "passed"
     except ImportError as e:
         report["status"] = "error"

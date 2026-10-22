@@ -52,7 +52,9 @@ class GlobalBudgetGuard:
                     r for r in self.app_state.degraded_reasons if "Daily LLM call budget" not in r
                 ]
                 self.app_state.degraded_notice = (
-                    "; ".join(self.app_state.degraded_reasons) if self.app_state.degraded_reasons else None
+                    "; ".join(self.app_state.degraded_reasons)
+                    if self.app_state.degraded_reasons
+                    else None
                 )
                 if self.app_state.configured_mode == ServiceMode.FULL:
                     self.app_state.mode = ServiceMode.FULL
@@ -87,7 +89,7 @@ class GlobalBudgetGuard:
             # 80% threshold warning
             if ratio >= 0.80 and not self.warned_at_80:
                 self.warned_at_80 = True
-                notice = f"Global LLM budget at {int(ratio*100)}% ({self.calls_today}/{self.daily_limit})"
+                notice = f"Global LLM budget at {int(ratio * 100)}% ({self.calls_today}/{self.daily_limit})"
                 logger.warning(notice)
                 if not self.app_state.degraded_notice:
                     self.app_state.degraded_notice = notice

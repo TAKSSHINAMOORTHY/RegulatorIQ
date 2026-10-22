@@ -6,7 +6,6 @@ Generates 32-byte URL-safe secrets and outputs masked version for safety.
 from __future__ import annotations
 
 import secrets
-import sys
 
 
 def generate_secret(prefix: str = "reg_") -> str:
@@ -16,7 +15,6 @@ def generate_secret(prefix: str = "reg_") -> str:
 
 def main():
     token = generate_secret()
-    masked = f"{'*' * (len(token) - 4)}{token[-4:]}"
     print(f"Generated Secret Token: ...{token[-4:]}")
 
 

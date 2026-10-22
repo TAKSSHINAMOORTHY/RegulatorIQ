@@ -7,7 +7,7 @@ from agent.events import AgentEvent
 from agent.types import RagAnswer
 from api.main import create_app
 from api.settings import APISettings
-from api.state import AppState, ServiceMode, ServiceStage, get_app_state
+from api.state import ServiceStage, get_app_state
 
 
 class MockAgentRunner:

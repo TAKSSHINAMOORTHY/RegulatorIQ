@@ -18,6 +18,7 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -58,7 +59,9 @@ def main():
     # Check local docker daemon availability
     docker_available = shutil.which("docker") is not None
     if not docker_available:
-        print("ℹ Docker daemon not available on local host; recorded as docker_unverified (covered by CI).")
+        print(
+            "ℹ Docker daemon not available on local host; recorded as docker_unverified (covered by CI)."
+        )
 
     # 2. Provider target configs and PENDING documentation
     print("\n[Step 2/6] Verifying provider deployment targets and PENDING guides...")
@@ -84,8 +87,16 @@ def main():
     assert len(schedules) == 10, f"Expected 10 cron schedules, found {len(schedules)}"
 
     expected_crons = [
-        "40 1 * * *", "10 3 * * *", "35 4 * * *", "20 6 * * *", "45 7 * * *",
-        "25 9 * * *", "50 10 * * *", "35 12 * * *", "10 14 * * *", "55 15 * * *"
+        "40 1 * * *",
+        "10 3 * * *",
+        "35 4 * * *",
+        "20 6 * * *",
+        "45 7 * * *",
+        "25 9 * * *",
+        "50 10 * * *",
+        "35 12 * * *",
+        "10 14 * * *",
+        "55 15 * * *",
     ]
     actual_crons = [s["cron"] for s in schedules]
     assert actual_crons == expected_crons, f"Cron schedules mismatch: {actual_crons}"
@@ -143,15 +154,29 @@ def main():
             "keepwarm": {
                 "workflow_path": ".github/workflows/warmup.yml",
                 "cron_utc": actual_crons,
-                "cron_ist": ["07:10", "08:40", "10:05", "11:50", "13:15", "14:55", "16:20", "18:05", "19:40", "21:25"],
+                "cron_ist": [
+                    "07:10",
+                    "08:40",
+                    "10:05",
+                    "11:50",
+                    "13:15",
+                    "14:55",
+                    "16:20",
+                    "18:05",
+                    "19:40",
+                    "21:25",
+                ],
                 "runs_per_day": 10,
             },
             "runbook_path": "docs/RUNBOOK.md",
             "release_gate_command": "make release-gate",
             "docker_unverified": not docker_available,
             "degraded_reasons": (
-                ["Host environment lacks local docker daemon; verified via static checks, unit tests, and GitHub Actions CI."]
-                if not docker_available else []
+                [
+                    "Host environment lacks local docker daemon; verified via static checks, unit tests, and GitHub Actions CI."
+                ]
+                if not docker_available
+                else []
             ),
         },
     }

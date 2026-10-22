@@ -52,7 +52,8 @@ def node_grade(
 
             # Check if identifier exact match is present
             has_id_match = any(
-                getattr(rc.chunk, "circular_no", None) and getattr(rc.chunk, "circular_no") in sub_q.text
+                getattr(rc.chunk, "circular_no", None)
+                and getattr(rc.chunk, "circular_no") in sub_q.text
                 for rc in chunks
             )
 
@@ -67,7 +68,9 @@ def node_grade(
                 passages_str = "\n\n".join(
                     f"[{rc.chunk.chunk_id}]: {rc.chunk.text[:300]}" for rc in borderline_chunks[:4]
                 )
-                prompt = prompt_template.replace("{question}", sub_q.text).replace("{passages}", passages_str)
+                prompt = prompt_template.replace("{question}", sub_q.text).replace(
+                    "{passages}", passages_str
+                )
                 try:
                     res = llm.generate([{"role": "user", "content": prompt}], max_tokens=200)
                     state.budget.llm_calls_used += 1
@@ -79,13 +82,21 @@ def node_grade(
                         if cid in grades_dict:
                             llm_verdict = str(grades_dict[cid].get("verdict", "partial")).lower()
                             llm_reason = str(grades_dict[cid].get("reason", "LLM graded"))
-                            all_grades[cid] = {"verdict": llm_verdict, "reason": llm_reason, "score": bc.rerank_score}
+                            all_grades[cid] = {
+                                "verdict": llm_verdict,
+                                "reason": llm_reason,
+                                "score": bc.rerank_score,
+                            }
                             if llm_verdict == "relevant":
                                 relevant_count += 1
                 except Exception:
                     pass
 
-            is_sub_q_satisfied = (relevant_count >= min_relevant_chunks) or has_id_match or (len(chunks) > 0 and chunks[0].rerank_score >= 0.70)
+            is_sub_q_satisfied = (
+                (relevant_count >= min_relevant_chunks)
+                or has_id_match
+                or (len(chunks) > 0 and chunks[0].rerank_score >= 0.70)
+            )
             if not is_sub_q_satisfied:
                 all_satisfied = False
 
@@ -98,7 +109,9 @@ def node_grade(
                 "grades_summary": {
                     "relevant": sum(1 for g in all_grades.values() if g["verdict"] == "relevant"),
                     "partial": sum(1 for g in all_grades.values() if g["verdict"] == "partial"),
-                    "irrelevant": sum(1 for g in all_grades.values() if g["verdict"] == "irrelevant"),
+                    "irrelevant": sum(
+                        1 for g in all_grades.values() if g["verdict"] == "irrelevant"
+                    ),
                 },
             },
         )

@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -26,7 +25,9 @@ def detect_available_targets() -> dict[str, bool]:
     """Detect provider targets based on environment credentials."""
     targets = {
         "oracle": bool(os.environ.get("OCI_TENANCY_OCID") or os.environ.get("OCI_USER_OCID")),
-        "cloudrun": bool(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") or os.environ.get("GCP_PROJECT")),
+        "cloudrun": bool(
+            os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") or os.environ.get("GCP_PROJECT")
+        ),
         "hfspace": bool(os.environ.get("HF_TOKEN")),
         "aws": bool(os.environ.get("AWS_ACCESS_KEY_ID") or os.environ.get("AWS_PROFILE")),
         "light": bool(os.environ.get("RENDER_API_KEY") or os.environ.get("KOYEB_TOKEN")),
@@ -39,12 +40,14 @@ def detect_available_targets() -> dict[str, bool]:
 def plan_deployment(targets: list[str]) -> list[dict]:
     plan = []
     for t in targets:
-        plan.append({
-            "target": t,
-            "action": "deploy",
-            "tier": "free",
-            "mode": "light" if t == "light" else "full",
-        })
+        plan.append(
+            {
+                "target": t,
+                "action": "deploy",
+                "tier": "free",
+                "mode": "light" if t == "light" else "full",
+            }
+        )
     return plan
 
 
@@ -60,7 +63,11 @@ def run_deployment(targets: list[str], apply: bool = False) -> dict:
 
     print("\nTarget Credential Detection:")
     for tgt, has_creds in available.items():
-        status = "Available (Credentials found)" if has_creds else "Missing credentials (Will write PENDING)"
+        status = (
+            "Available (Credentials found)"
+            if has_creds
+            else "Missing credentials (Will write PENDING)"
+        )
         print(f"  - {tgt:10s}: {status}")
 
     deployments = []
@@ -76,14 +83,20 @@ def run_deployment(targets: list[str], apply: bool = False) -> dict:
     for item in plan:
         tgt = item["target"]
         if not available.get(tgt, False) and tgt != "local":
-            print(f"\n[Target: {tgt}] Skipping live deploy (No credentials). Refer to deploy/PENDING_{tgt}.md")
+            print(
+                f"\n[Target: {tgt}] Skipping live deploy (No credentials). Refer to deploy/PENDING_{tgt}.md"
+            )
             pending_targets.append(tgt)
             continue
 
         if apply:
             print(f"\n[Target: {tgt}] Executing deployment...")
             # In local or real target
-            url = f"http://localhost:8000" if tgt == "local" else f"https://regulatoriq-{tgt}.example.com"
+            url = (
+                "http://localhost:8000"
+                if tgt == "local"
+                else f"https://regulatoriq-{tgt}.example.com"
+            )
             dep_record = {
                 "target": tgt,
                 "url": url,

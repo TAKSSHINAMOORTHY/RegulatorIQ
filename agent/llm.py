@@ -187,6 +187,7 @@ class FakeLLMProvider(BaseLLMProvider):
         seed: int = 0,
     ) -> LLMResult:
         user_prompt = messages[-1].get("content", "")
+        parsed: Optional[Dict[str, Any]] = None
         # If refusal requested or out of scope
         if "out of scope" in user_prompt.lower() or "unanswerable" in user_prompt.lower():
             text = "I cannot answer this question as the provided documents do not contain the necessary information."
