@@ -179,3 +179,14 @@ class SafetyGuard:
             )
 
         return GuardOutcome(status="allow", clean_text=clean_text)
+
+
+_DEFAULT_GUARD: Optional[SafetyGuard] = None
+
+
+def redact_pii(text: str) -> Tuple[str, List[str]]:
+    """Convenience module function for PII redaction using default SafetyGuard."""
+    global _DEFAULT_GUARD
+    if _DEFAULT_GUARD is None:
+        _DEFAULT_GUARD = SafetyGuard()
+    return _DEFAULT_GUARD.redact_pii(text)

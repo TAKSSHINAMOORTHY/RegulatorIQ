@@ -447,6 +447,43 @@
       "notes": [
         "Phase 6 complete: Bounded LangGraph Agentic RAG with dynamic routing, decomposition, grading, validity resolution, cross-referencing, self-checking hallucination guard, streaming events, and ablation report"
       ]
+    },
+    "7": {
+      "status": "completed",
+      "completed_at": "2026-10-22T08:42:39Z",
+      "artifacts": {
+        "api_entrypoint": "api.main:app",
+        "openapi_path": "docs/openapi.json",
+        "events_doc": "docs/events.md",
+        "api_doc": "docs/API.md",
+        "env_example_path": ".env.example",
+        "endpoints": [
+          "/health",
+          "/ready",
+          "/warmup",
+          "/ask",
+          "/feedback",
+          "/meta",
+          "/version",
+          "/metrics"
+        ],
+        "modes": [
+          "full",
+          "rules",
+          "light"
+        ],
+        "mock_api_path": "scripts/mock_api.py",
+        "default_port": 8000,
+        "preflight_cmd": "python -m api.preflight",
+        "index_fetch_cmd": "python -m api.index_fetch",
+        "limits": {
+          "ask_rpm": 12,
+          "ask_daily_per_ip": 150,
+          "max_concurrent_asks": 2,
+          "max_question_chars": 1000
+        },
+        "coverage_pct": 85.0
+      }
     }
   }
 }

@@ -103,6 +103,13 @@ INJECTION_PATTERNS_PATH = CONFIG_DIR / "injection_patterns.yaml"
 AGENT_REPORT_MD = REPORTS_DIR / "agent_report.md"
 AGENT_TUNING_LOG = ABLATION_DIR / "agent_tuning_log.jsonl"
 
+# Phase 7 API Paths
+API_DIR = ROOT / "api"
+OPENAPI_PATH = DOCS_DIR / "openapi.json"
+TRACE_LOG_DIR = REPORTS_DIR / "logs" / "traces"
+FEEDBACK_DIR = DATA_DIR / "feedback"
+FEEDBACK_PATH = FEEDBACK_DIR / "feedback.jsonl"
+
 # Auto-create essential directories on import
 for directory in (
     DATA_DIR,
@@ -127,5 +134,7 @@ for directory in (
     RERANK_CACHE_DIR,
     AGENT_PROMPTS_DIR,
     SCENARIOS_DIR,
+    TRACE_LOG_DIR,
+    FEEDBACK_DIR,
 ):
     directory.mkdir(parents=True, exist_ok=True)

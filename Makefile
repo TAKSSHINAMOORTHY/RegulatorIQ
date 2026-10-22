@@ -129,6 +129,31 @@ agent-demo:
 verify-p6:
 	$(PYTHON) scripts/verify_p6.py
 
+openapi:
+	$(PYTHON) scripts/dump_openapi.py
+
+events-doc:
+	$(PYTHON) scripts/generate_events_doc.py
+
+api-dev:
+	$(PYTHON) -m uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+
+api-run:
+	$(PYTHON) -m uvicorn api.main:app --host 0.0.0.0 --port 8000
+
+api-test:
+	$(PYTEST) tests/unit/test_api_*.py --cov=api --cov-report=term-missing
+
+api-security:
+	$(PYTEST) tests/unit/test_api_security_*.py
+
+mock-api:
+	$(PYTHON) scripts/mock_api.py --port 8000
+
+verify-p7:
+	$(PYTHON) scripts/verify_p7.py
+
 clean-data:
 	rm -rf data/raw/* data/interim/* data/manifests/*
+
 

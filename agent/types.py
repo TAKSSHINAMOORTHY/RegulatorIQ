@@ -56,3 +56,8 @@ class RagAnswer:
     mode: str = "rules"
     degraded_flags: List[str] = field(default_factory=list)
     disclaimer_key: str = "regulatory_disclaimer"
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert RagAnswer dataclass to dictionary."""
+        from dataclasses import asdict
+        return asdict(self)
