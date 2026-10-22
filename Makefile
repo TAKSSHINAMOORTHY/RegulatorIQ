@@ -1,11 +1,11 @@
 .PHONY: help bootstrap data data-resume test test-int test-live test-all lint typecheck ci verify-p1 verify-p2 parse chunk links process clean-data
 
 VENV ?= .venv
-PYTHON ?= $(VENV)/bin/python
-PIP ?= $(VENV)/bin/pip
-PYTEST ?= $(VENV)/bin/pytest
-RUFF ?= $(VENV)/bin/ruff
-MYPY ?= $(VENV)/bin/mypy
+PYTHON ?= $(if $(wildcard $(VENV)/bin/python),$(VENV)/bin/python,python3)
+PIP ?= $(if $(wildcard $(VENV)/bin/pip),$(VENV)/bin/pip,pip)
+PYTEST ?= $(if $(wildcard $(VENV)/bin/pytest),$(VENV)/bin/pytest,pytest)
+RUFF ?= $(if $(wildcard $(VENV)/bin/ruff),$(VENV)/bin/ruff,ruff)
+MYPY ?= $(if $(wildcard $(VENV)/bin/mypy),$(VENV)/bin/mypy,mypy)
 
 help:
 	@echo "RegulatorIQ Makefile Targets:"
@@ -215,5 +215,4 @@ verify-p10:
 
 clean-data:
 	rm -rf data/raw/* data/interim/* data/manifests/*
-
 

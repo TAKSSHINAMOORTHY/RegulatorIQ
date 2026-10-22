@@ -1,4 +1,3 @@
-import { generateReport } from "../../scripts/check_contrast.ts";
 // In case ts-node is not installed, provide native JS execution:
 import fs from "node:fs";
 import path from "node:path";
