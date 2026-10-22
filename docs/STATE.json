@@ -4,10 +4,10 @@
   "phases": {
     "1": {
       "status": "complete",
-      "completed_at": "2026-10-22T06:06:29.920148Z",
+      "completed_at": "2026-10-22T06:50:26.209346Z",
       "commit": null,
       "artifacts": {
-        "manifest_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-26/test_generate_corpus_report0/manifest.jsonl",
+        "manifest_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-38/test_generate_corpus_report0/manifest.jsonl",
         "raw_dir": "/Users/datchu/Downloads/Projects/RBI/data/raw/rbi",
         "paths_module": "config.paths"
       },
@@ -27,12 +27,12 @@
     },
     "2": {
       "status": "complete",
-      "completed_at": "2026-10-22T06:06:29.913741Z",
+      "completed_at": "2026-10-22T06:50:26.205477Z",
       "commit": null,
       "artifacts": {
-        "documents_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-26/test_run_full_processing_smoke0/documents.parquet",
-        "chunks_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-26/test_run_full_processing_smoke0/chunks.parquet",
-        "links_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-26/test_run_full_processing_smoke0/links.parquet",
+        "documents_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-38/test_run_full_processing_smoke0/documents.parquet",
+        "chunks_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-38/test_run_full_processing_smoke0/chunks.parquet",
+        "links_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-38/test_run_full_processing_smoke0/links.parquet",
         "chunk_count": 111,
         "doc_count": 25,
         "token_stats": {
@@ -57,12 +57,12 @@
     },
     "3": {
       "status": "complete",
-      "completed_at": "2026-10-22T06:06:00.253724Z",
+      "completed_at": "2026-10-22T06:49:57.308696Z",
       "commit": null,
       "artifacts": {
-        "index_dir": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-26/test_build_index_and_package0/artifacts/index/2.1.0-fake-f05c293a",
+        "index_dir": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-38/test_build_index_and_package0/artifacts/index/2.1.0-fake-f05c293a",
         "index_version": "2.1.0-fake-f05c293a",
-        "pointer_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-26/test_build_index_and_package0/artifacts/index/CURRENT",
+        "pointer_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-38/test_build_index_and_package0/artifacts/index/CURRENT",
         "embedder": {
           "name": "fake",
           "dim": 384,
@@ -71,10 +71,10 @@
         "vector_backend": "faiss",
         "quantisation": "fp16",
         "total_bytes": 39848,
-        "load_seconds": 0.01,
+        "load_seconds": 0.008,
         "p95_latency_ms": {
-          "dense": 0.33078560081776226,
-          "bm25": 1.0514203513594111
+          "dense": 0.18723109969869245,
+          "bm25": 0.5007227995520224
         },
         "chunk_count": 12,
         "doc_count": 6,
@@ -355,6 +355,78 @@
       "notes": [
         "Phase 4 evaluation set v1 frozen and baseline RAG benchmarked",
         "Full 100 questions verified against real RBI corpus chunks"
+      ]
+    },
+    "5": {
+      "status": "complete",
+      "artifacts": {
+        "best_system": "hybrid_rerank_context",
+        "retrieval_config_path": "config/retrieval.yaml",
+        "retriever_entrypoint": "retrieval.pipeline:Retriever",
+        "reranker": {
+          "id": "Xenova/ms-marco-MiniLM-L-6-v2",
+          "revision": "onnx-v1",
+          "degraded": false
+        },
+        "calibration_path": "config/calibration.json",
+        "prompt_rag_v2_path": "agent/prompts/rag.v2.txt",
+        "ablation_report_path": "reports/ablation.md",
+        "claims_path": "reports/claims.md",
+        "test_touch_log_path": "evals/test_touch_log.jsonl",
+        "metrics_best": {
+          "recall_at_5": {
+            "mean": 0.6959,
+            "ci": [
+              0.612,
+              0.778
+            ]
+          },
+          "ndcg_at_10": {
+            "mean": 0.8335,
+            "ci": [
+              0.773,
+              0.891
+            ]
+          },
+          "mrr": {
+            "mean": 0.8863,
+            "ci": [
+              0.835,
+              0.934
+            ]
+          },
+          "doc_recall_at_5": {
+            "mean": 0.9,
+            "ci": [
+              0.825,
+              0.975
+            ]
+          },
+          "hit_at_5": {
+            "mean": 0.95,
+            "ci": [
+              0.875,
+              1.0
+            ]
+          }
+        },
+        "p95_latency_ms": {
+          "retrieval_total": 20.0,
+          "rerank": 15.0
+        },
+        "rewrite_modes_available": [
+          "rules",
+          "llm_rewrite",
+          "hyde",
+          "multi_query"
+        ],
+        "degraded_reasons": []
+      },
+      "notes": [
+        "Phase 5 complete: Hybrid RRF retrieval, MiniLM ONNX reranking, query rewriting, and context assembly implemented",
+        "Ablation study across all 9 systems completed on dev and test splits",
+        "Calibrated confidence model fit on dev and verified",
+        "Strict test split discipline enforced (1 touch per system recorded in test_touch_log.jsonl)"
       ]
     }
   }

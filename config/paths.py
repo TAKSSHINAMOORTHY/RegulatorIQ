@@ -82,6 +82,15 @@ EVAL_SET_META = EVALS_DIR / "eval_set.v1.meta.json"
 RUNS_DIR = EVALS_DIR / "runs"
 BASELINES_DIR = EVALS_DIR / "baselines"
 THRESHOLDS_PATH = EVALS_DIR / "thresholds.yaml"
+ABLATION_DIR = EVALS_DIR / "ablations"
+TEST_TOUCH_LOG = EVALS_DIR / "test_touch_log.jsonl"
+
+# Phase 5 Retrieval & Ablation artifacts
+RETRIEVAL_CONFIG = CONFIG_DIR / "retrieval.yaml"
+CALIBRATION_PATH = CONFIG_DIR / "calibration.json"
+PROMPT_RAG_V2_PATH = ROOT / "agent" / "prompts" / "rag.v2.txt"
+ABLATION_REPORT_MD = REPORTS_DIR / "ablation.md"
+CLAIMS_MD = REPORTS_DIR / "claims.md"
 
 # Auto-create essential directories on import
 for directory in (
@@ -103,5 +112,7 @@ for directory in (
     RUNS_DIR,
     BASELINES_DIR,
     LLM_CACHE_DIR,
+    ABLATION_DIR,
+    RERANK_CACHE_DIR,
 ):
     directory.mkdir(parents=True, exist_ok=True)

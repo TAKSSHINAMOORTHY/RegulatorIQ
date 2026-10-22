@@ -105,5 +105,15 @@ eval-compare:
 verify-p4:
 	$(PYTHON) scripts/verify_p4.py
 
+tune:
+	$(PYTHON) scripts/tune_retrieval.py
+
+ablate:
+	$(PYTHON) scripts/run_ablation.py
+
+verify-p5:
+	$(PYTHON) scripts/verify_p5.py
+
 clean-data:
 	rm -rf data/raw/* data/interim/* data/manifests/*
+

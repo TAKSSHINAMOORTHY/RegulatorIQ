@@ -1,0 +1,40 @@
+retrieval:
+  version: 1.0.0
+  tuned_on: dev
+  hybrid:
+    k_dense: 50
+    k_bm25: 50
+    fusion_method: rrf
+    rrf_k: 60
+    w_dense: 1.0
+    w_bm25: 1.5
+    alpha_dense: 0.5
+    boost_id: 0.1
+    lambda_superseded: 0.85
+    min_pool: 10
+    max_id_chunks_per_doc: 20
+    apply_temporal: true
+    apply_id_boost: true
+  reranker:
+    enabled: true
+    model_name: Xenova/ms-marco-MiniLM-L-6-v2
+    rerank_depth: 30
+    top_n: 8
+    early_exit_margin: 0.05
+  rewrite:
+    use_rules: true
+    use_llm_rewrite: false
+    use_hyde: false
+    use_multi_query: false
+  context:
+    token_budget: 3000
+    dedupe_threshold: 92.0
+    expand_neighbors: false
+    use_mmr: false
+    lambda_mmr: 0.7
+    per_doc_cap: 3
+  cv_scores:
+    recall_at_5: 0.7292
+    ndcg_at_10: 0.8129
+    objective: 0.771
+    p95_latency_ms: 97.14

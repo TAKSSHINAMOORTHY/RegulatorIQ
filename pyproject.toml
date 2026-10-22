@@ -26,7 +26,9 @@ dependencies = [
     "python-dateutil>=2.9.0",
     "tqdm>=4.66.0",
     "orjson>=3.9.15",
+    "matplotlib>=3.8.0",
 ]
+
 
 [project.optional-dependencies]
 dev = [

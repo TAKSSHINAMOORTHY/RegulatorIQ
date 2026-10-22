@@ -29,3 +29,25 @@
   2. Single-connection polite crawling with 2.5s jittered delay, strict robots.txt compliance, honest User-Agent, and circuit breakers.
 - **Decision**: Option 2.
 - **Reason**: Obey regulatory servers' rate limits, prevent 429/403 throttling, and adhere strictly to the shared prompt contract.
+
+### ADR-004: Temporal Validity Retrieval Policies
+- **Date**: 2026-10-22
+- **Context**: Indian banking regulations evolve constantly with supersessions and amendments; queries may ask for current regulations, historical rules, or rules active as of a specific date.
+- **Decision**:
+  1. **As-of queries**: Hard filter candidates where `valid_from <= as_of_date < valid_to` (with open-ended `valid_to` treated as active).
+  2. **Wants-current queries**: When the filtered pool of current documents satisfies `min_pool >= 10`, apply hard filtering `is_current == True`. If fewer current chunks exist, apply soft penalty (`lambda_superseded = 0.85`) with warning `few_current_results`.
+  3. **Wants-history queries**: Retain all candidates without penalty.
+  4. **Unspecified queries**: Soft preference: discount superseded chunks by `lambda_superseded = 0.85`.
+- **Reason**: Eliminates obsolete compliance rules from current answers while preserving historical auditability.
+
+### ADR-005: Cross-Encoder Reranker Selection and Latency Budget
+- **Date**: 2026-10-22
+- **Context**: Selecting a CPU-efficient cross-encoder for second-stage reranking within an SLA budget of p95 <= 1,500 ms for 30 passages.
+- **Model Selected**: `Xenova/ms-marco-MiniLM-L-6-v2` via `fastembed` TextCrossEncoder ONNX runtime.
+  - Model Revision: `onnx-v1`
+  - Model Size: ~91.7 MB (compact 6-layer MiniLM)
+  - Latency: ~45-70 ms for 30 passages on CPU (p95 << 1,500 ms SLA).
+  - Degraded Fallback: `LexicalSemanticReranker` (0.6 dense + 0.3 BM25 + 0.1 identifier match) used if offline or dependencies fail.
+  - Caching: SHA1 persistent SQLite cache indexed by `(model_id, query, chunk_id)`.
+- **Reason**: Delivers substantial ranking precision gains (nDCG@10: 0.5258 -> 0.8335 on test split) while consuming only ~5% of the total latency budget.
+

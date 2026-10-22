@@ -51,12 +51,20 @@ def find_latest_run_for_system(system_name: str, split: str = "test") -> Optiona
 def check_regression_gates(system_name: str, run_id_or_path: Optional[str] = None) -> bool:
     """Validate system metrics against regression gates."""
     thresholds_data = load_thresholds()
-    metric_gates = thresholds_data.get("metric_gates", {})
+    # Check if a system-specific configuration exists
+    if "systems" in thresholds_data and system_name in thresholds_data["systems"]:
+        sys_cfg = thresholds_data["systems"][system_name]
+        metric_gates = sys_cfg.get("metric_gates", {})
+        overall_gate = sys_cfg.get("overall_score_floor")
+    else:
+        metric_gates = thresholds_data.get("metric_gates", {})
+        overall_gate = thresholds_data.get("overall_score_floor")
 
     if run_id_or_path:
         run_path = Path(run_id_or_path)
         if not run_path.is_dir():
             run_path = RUNS_DIR / run_id_or_path
+
     else:
         run_path = find_latest_run_for_system(system_name, split="test")
         if not run_path:
@@ -80,7 +88,6 @@ def check_regression_gates(system_name: str, run_id_or_path: Optional[str] = Non
     failures: List[str] = []
 
     # Check overall score gate if present
-    overall_gate = thresholds_data.get("overall_score_floor")
     if overall_gate is not None:
         if overall < overall_gate:
             failures.append(f"Overall score {overall:.4f} is below floor {overall_gate:.4f}")

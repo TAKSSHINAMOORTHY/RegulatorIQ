@@ -39,6 +39,7 @@ from evals.metrics import (
     compute_recall_at_k,
 )
 from evals.systems import get_system
+from evals.test_guard import check_and_log_test_touch
 from retrieval.index_store import IndexStore
 
 
@@ -157,7 +158,9 @@ def evaluate_sample(
         "false_refusal_rate": false_refusal,
         "hallucination_rate": hallucination_rate,
         "temporal_accuracy": temporal_acc,
-        "latency_total_s": rag_answer.timings.get("total_s", 0.0),
+        "latency_total_s": rag_answer.timings.get(
+            "total_s", rag_answer.timings.get("total_ms", 0.0) / 1000.0
+        ),
         "tokens_in": rag_answer.usage.get("in", 0),
         "tokens_out": rag_answer.usage.get("out", 0),
         "claims_verdicts": claims_verdicts,
@@ -196,6 +199,9 @@ def run_evaluation(
     judge_type: str = "lexical_support",
     seed: int = 42,
     save_run: bool = True,
+    retrieval_only: bool = False,
+    force_test_touch: bool = False,
+    force_reason: str = "",
 ) -> Tuple[str, Dict[str, Any]]:
     """Run full evaluation suite over specified split."""
     if not eval_set_path.exists():
@@ -225,7 +231,7 @@ def run_evaluation(
 
     # Load system
     store = IndexStore.load(verify="fast")
-    system = get_system(system_name, index_store=store)
+    system = get_system(system_name, index_store=store, retrieval_only=retrieval_only)
 
     utc_now = datetime.now(timezone.utc)
     ts_str = utc_now.strftime("%Y%m%d_%H%M%S")
@@ -236,7 +242,21 @@ def run_evaluation(
     cfg_hash = hashlib.sha256(cfg_raw).hexdigest()[:8]
     run_id = f"{ts_str}_{cfg_hash}"
 
+    # Anti-tamper test touch log check for test split (F3)
+    touch_count = 0
+    if split in ("test", "all"):
+        purpose = "retrieval_ablation" if retrieval_only else "evaluation"
+        touch_count = check_and_log_test_touch(
+            system_name=system_name,
+            config_hash=cfg_hash,
+            run_id=run_id,
+            purpose=purpose,
+            force=force_test_touch,
+            force_reason=force_reason,
+        )
+
     results = []
+
     run_logs = []
     failure_buckets: Dict[str, List[Dict[str, Any]]] = {
         "retrieval_miss": [],
@@ -356,11 +376,16 @@ def run_evaluation(
         "timestamp_utc": utc_now.isoformat(),
         "system_name": system_name,
         "split": split,
+        "retrieval_only": retrieval_only,
+        "test_touch_count": touch_count,
+        "force_reason": force_reason if touch_count > 1 else "",
         "sample_count": len(results),
         "index_version": store.version,
         "eval_set_path": str(eval_set_path),
         "eval_set_sha256": eval_sha,
-        "llm_provider": system.llm.provider.name if hasattr(system, "llm") else "extractive",
+        "llm_provider": system.llm.provider.name
+        if hasattr(system, "llm")
+        else ("none" if retrieval_only else "extractive"),
         "llm_model": system.llm.provider.model if hasattr(system, "llm") else "none",
         "judge_type": judge_type,
         "git_commit": get_git_commit(),
@@ -411,8 +436,13 @@ def _render_markdown_report(
     md = []
     md.append(f"# RegulatorIQ Evaluation Report: Run `{cfg['run_id']}`")
     md.append("")
+    if cfg.get("test_touch_count", 0) > 1:
+        md.append(
+            f"> [!WARNING]\n> Test split re-used {cfg['test_touch_count']} times (Reason: {cfg.get('force_reason')})\n"
+        )
     md.append(f"- **System**: `{cfg['system_name']}`")
     md.append(f"- **Split**: `{cfg['split']}` ({cfg['sample_count']} samples)")
+    md.append(f"- **Retrieval Only**: `{cfg.get('retrieval_only', False)}`")
     md.append(f"- **LLM Provider**: `{cfg['llm_provider']}` ({cfg['llm_model']})")
     md.append(f"- **Judge Type**: `{cfg['judge_type']}`")
     md.append(f"- **Overall Weighted Score**: **{metrics_payload['overall_score']}**")
@@ -488,10 +518,30 @@ if __name__ == "__main__":
     parser.add_argument(
         "--judge-type", default="lexical_support", help="Judge type for faithfulness"
     )
+    parser.add_argument(
+        "--retrieval-only",
+        action="store_true",
+        help="Run retrieval-only evaluation without LLM generation",
+    )
+    parser.add_argument(
+        "--force-test-touch",
+        action="store_true",
+        help="Force re-running on test split if already touched",
+    )
+    parser.add_argument(
+        "--force-reason",
+        default="",
+        help="Documented reason for re-running on test split",
+    )
     args = parser.parse_args()
 
     run_id, payload = run_evaluation(
-        system_name=args.system, split=args.split, judge_type=args.judge_type
+        system_name=args.system,
+        split=args.split,
+        judge_type=args.judge_type,
+        retrieval_only=args.retrieval_only,
+        force_test_touch=args.force_test_touch,
+        force_reason=args.force_reason,
     )
     print(f"Evaluation complete. Run ID: {run_id}")
     print(f"Overall Score: {payload['overall_score']}")

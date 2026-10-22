@@ -1,0 +1,10 @@
+{
+  "w_top1": 5.222120661127116,
+  "w_margin": 8.134324964459822,
+  "intercept": -4.48861319998851,
+  "fitted": true,
+  "stats": {
+    "accuracy": 1.0,
+    "samples": 12
+  }
+}

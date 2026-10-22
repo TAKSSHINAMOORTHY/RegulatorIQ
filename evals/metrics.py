@@ -103,6 +103,7 @@ def normalize_text(text: str) -> str:
     t = normalize_numbers_and_currency(t)
     # Strip non-alphanumeric except % and -
     t = re.sub(r"[^\w\s%\-]", " ", t)
+    t = re.sub(r"(\d+)\s+%", r"\1%", t)
     t = re.sub(r"\s+", " ", t).strip()
     return t
 
