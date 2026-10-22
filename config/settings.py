@@ -81,6 +81,22 @@ class Settings(BaseSettings):
         description="GitHub token for publishing releases",
     )
 
+    # LLM & Generation (defaults for Phase 4+)
+    LLM_PROVIDER: str = Field(
+        default="auto",
+        description="LLM provider: auto | gemini | groq | openai_compat | extractive | fake",
+    )
+    GEMINI_API_KEY: Optional[str] = Field(default=None, description="Google Gemini API Key")
+    GROQ_API_KEY: Optional[str] = Field(default=None, description="Groq Cloud API Key")
+    LLM_API_KEY: Optional[str] = Field(default=None, description="OpenAI/Compatible API Key")
+    LLM_BASE_URL: Optional[str] = Field(
+        default=None, description="Base URL for OpenAI-compatible endpoint"
+    )
+    LLM_MODEL: Optional[str] = Field(default=None, description="Explicit LLM model name")
+    LLM_MAX_CALLS: int = Field(default=150, description="Per-run maximum LLM call budget")
+    LLM_MAX_TOKENS: int = Field(default=150000, description="Per-run maximum token budget")
+    LLM_DAILY_CALL_CAP: int = Field(default=500, description="Daily safety call cap")
+
     # Logging and Tracing
     LOG_LEVEL: str = Field(default="INFO", description="Log level")
     TRACE_REDACT_QUESTIONS: bool = Field(default=True, description="Redact PII in traces")

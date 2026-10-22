@@ -38,6 +38,7 @@ artifacts/llm_cache/
 artifacts/dist/
 
 # Logs & temp
+evals/runs/
 reports/logs/
 *.log
 .coverage

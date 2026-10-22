@@ -1,0 +1,13 @@
+patterns:
+  - "(?i)cannot find"
+  - "(?i)not available in the provided documents"
+  - "(?i)does not contain"
+  - "(?i)information is not provided"
+  - "(?i)no information"
+  - "(?i)not mentioned in the"
+  - "(?i)outside the scope"
+  - "(?i)not found in the context"
+  - "(?i)unanswerable from the provided"
+  - "(?i)the provided documents do not"
+  - "(?i)i cannot answer"
+  - "(?i)i am unable to answer"

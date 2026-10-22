@@ -1,0 +1,8 @@
+synonyms:
+  banks: ["banking institutions", "lenders", "scheduled commercial banks", "commercial banks"]
+  rules: ["guidelines", "norms", "directions", "instructions", "framework"]
+  effective_date: ["commencement date", "applicable date", "date of enforcement"]
+  limits: ["caps", "thresholds", "ceilings", "prescribed ceilings"]
+  borrowers: ["customers", "loan applicants", "clients"]
+  superseded: ["withdrawn", "repealed", "replaced", "no longer in force"]
+  circular: ["notification", "official communication", "direction"]

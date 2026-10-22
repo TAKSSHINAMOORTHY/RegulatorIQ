@@ -1,0 +1,34 @@
+{
+  "index_version": "2.1.0-BAAI_bge-small-en-v1_5-799bed3e",
+  "seed": 42,
+  "total_questions": 100,
+  "quotas": {
+    "exact_lookup": 25,
+    "temporal": 25,
+    "multi_hop": 20,
+    "semantic_paraphrase": 20,
+    "unanswerable": 10
+  },
+  "counts_by_type": {
+    "exact_lookup": 25,
+    "temporal": 25,
+    "multi_hop": 20,
+    "semantic_paraphrase": 20,
+    "unanswerable": 10
+  },
+  "counts_by_split": {
+    "dev": 60,
+    "test": 40
+  },
+  "shortfalls": [],
+  "provenance_mix": {
+    "template": 100,
+    "llm": 0,
+    "hybrid": 0
+  },
+  "verification_stats": {
+    "total_verified": 100,
+    "hard_checks_pass_rate": 1.0
+  },
+  "sha256": "a571921f3e9fd74187d1175fcdc37a1ef6f9ea03cff646d81ac9e4a1c7376f74"
+}

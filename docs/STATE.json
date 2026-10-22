@@ -4,10 +4,10 @@
   "phases": {
     "1": {
       "status": "complete",
-      "completed_at": "2026-10-21T21:19:43.946238Z",
+      "completed_at": "2026-10-22T06:06:29.920148Z",
       "commit": null,
       "artifacts": {
-        "manifest_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-17/test_generate_corpus_report0/manifest.jsonl",
+        "manifest_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-26/test_generate_corpus_report0/manifest.jsonl",
         "raw_dir": "/Users/datchu/Downloads/Projects/RBI/data/raw/rbi",
         "paths_module": "config.paths"
       },
@@ -27,12 +27,12 @@
     },
     "2": {
       "status": "complete",
-      "completed_at": "2026-10-21T21:19:43.939948Z",
+      "completed_at": "2026-10-22T06:06:29.913741Z",
       "commit": null,
       "artifacts": {
-        "documents_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-17/test_run_full_processing_smoke0/documents.parquet",
-        "chunks_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-17/test_run_full_processing_smoke0/chunks.parquet",
-        "links_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-17/test_run_full_processing_smoke0/links.parquet",
+        "documents_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-26/test_run_full_processing_smoke0/documents.parquet",
+        "chunks_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-26/test_run_full_processing_smoke0/chunks.parquet",
+        "links_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-26/test_run_full_processing_smoke0/links.parquet",
         "chunk_count": 111,
         "doc_count": 25,
         "token_stats": {
@@ -57,12 +57,12 @@
     },
     "3": {
       "status": "complete",
-      "completed_at": "2026-10-21T21:19:27.510016Z",
+      "completed_at": "2026-10-22T06:06:00.253724Z",
       "commit": null,
       "artifacts": {
-        "index_dir": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-17/test_build_index_and_package0/artifacts/index/2.1.0-fake-f05c293a",
+        "index_dir": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-26/test_build_index_and_package0/artifacts/index/2.1.0-fake-f05c293a",
         "index_version": "2.1.0-fake-f05c293a",
-        "pointer_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-17/test_build_index_and_package0/artifacts/index/CURRENT",
+        "pointer_path": "/private/var/folders/6g/6w9sqpqj7_qgtrkdn2t4llrw0000gn/T/pytest-of-datchu/pytest-26/test_build_index_and_package0/artifacts/index/CURRENT",
         "embedder": {
           "name": "fake",
           "dim": 384,
@@ -71,10 +71,10 @@
         "vector_backend": "faiss",
         "quantisation": "fp16",
         "total_bytes": 39848,
-        "load_seconds": 0.012,
+        "load_seconds": 0.01,
         "p95_latency_ms": {
-          "dense": 1.1767248513933724,
-          "bm25": 1.0948271494271464
+          "dense": 0.33078560081776226,
+          "bm25": 1.0514203513594111
         },
         "chunk_count": 12,
         "doc_count": 6,
@@ -96,6 +96,266 @@
         "docs": 6
       },
       "notes": []
+    },
+    "4": {
+      "status": "complete",
+      "completed_at": "2026-10-22T05:55:59.565711+00:00",
+      "commit": null,
+      "artifacts": {
+        "eval_set_path": "/Users/datchu/Downloads/Projects/RBI/evals/eval_set.v1.jsonl",
+        "eval_set_sha256": "a571921f3e9fd74187d1175fcdc37a1ef6f9ea03cff646d81ac9e4a1c7376f74",
+        "eval_counts": {
+          "type": {
+            "exact_lookup": {
+              "count": 10,
+              "recall_at_5": 0.6445,
+              "mrr": 0.6833,
+              "answer_correctness": 0.1,
+              "faithfulness": 0.0125,
+              "citation_precision": 0.5,
+              "refusal_accuracy": 0.0
+            },
+            "temporal": {
+              "count": 10,
+              "recall_at_5": 0.6048,
+              "mrr": 0.6917,
+              "answer_correctness": 0.3167,
+              "faithfulness": 0.0,
+              "citation_precision": 0.6,
+              "refusal_accuracy": 0.0
+            },
+            "multi_hop": {
+              "count": 8,
+              "recall_at_5": 0.1807,
+              "mrr": 0.2229,
+              "answer_correctness": 0.3542,
+              "faithfulness": 0.0,
+              "citation_precision": 0.5,
+              "refusal_accuracy": 0.0
+            },
+            "semantic_paraphrase": {
+              "count": 8,
+              "recall_at_5": 0.4688,
+              "mrr": 0.5417,
+              "answer_correctness": 0.0417,
+              "faithfulness": 0.0,
+              "citation_precision": 0.125,
+              "refusal_accuracy": 0.0
+            },
+            "unanswerable": {
+              "count": 4,
+              "recall_at_5": 1.0,
+              "mrr": 1.0,
+              "answer_correctness": 0.0,
+              "faithfulness": 0.0,
+              "citation_precision": 0.0,
+              "refusal_accuracy": 0.0
+            }
+          },
+          "total": 100,
+          "split": {
+            "dev": 60,
+            "test": 40
+          }
+        },
+        "shortfalls": [],
+        "baseline_run_id_dev": "20261022_055316_180458cd",
+        "baseline_run_id_test": "20261022_055322_dfa88005",
+        "baseline_metrics": {
+          "recall_at_1": {
+            "mean": 0.2235,
+            "ci_low": 0.131,
+            "ci_high": 0.3202,
+            "ci_half_width": 0.0946,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "recall_at_3": {
+            "mean": 0.406,
+            "ci_low": 0.2967,
+            "ci_high": 0.5214,
+            "ci_half_width": 0.1124,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "recall_at_5": {
+            "mean": 0.5422,
+            "ci_low": 0.4269,
+            "ci_high": 0.6556,
+            "ci_half_width": 0.1144,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "recall_at_10": {
+            "mean": 0.5422,
+            "ci_low": 0.4269,
+            "ci_high": 0.6556,
+            "ci_half_width": 0.1144,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "recall_at_20": {
+            "mean": 0.5422,
+            "ci_low": 0.4269,
+            "ci_high": 0.6556,
+            "ci_half_width": 0.1144,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "hit_at_1": {
+            "mean": 0.5,
+            "ci_low": 0.325,
+            "ci_high": 0.65,
+            "ci_half_width": 0.1625,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "hit_at_5": {
+            "mean": 0.775,
+            "ci_low": 0.65,
+            "ci_high": 0.9,
+            "ci_half_width": 0.125,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "hit_at_20": {
+            "mean": 0.775,
+            "ci_low": 0.65,
+            "ci_high": 0.9,
+            "ci_half_width": 0.125,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "mrr": {
+            "mean": 0.5967,
+            "ci_low": 0.4612,
+            "ci_high": 0.7288,
+            "ci_half_width": 0.1338,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "ndcg_at_10": {
+            "mean": 0.5258,
+            "ci_low": 0.4082,
+            "ci_high": 0.645,
+            "ci_half_width": 0.1184,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "doc_recall_at_5": {
+            "mean": 0.8375,
+            "ci_low": 0.725,
+            "ci_high": 0.9375,
+            "ci_half_width": 0.1063,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "all_gold_found": {
+            "mean": 0.8,
+            "ci_low": 0.675,
+            "ci_high": 0.9,
+            "ci_half_width": 0.1125,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "gold_in_context": {
+            "mean": 0.675,
+            "ci_low": 0.525,
+            "ci_high": 0.8,
+            "ci_half_width": 0.1375,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "answer_correctness": {
+            "mean": 0.1833,
+            "ci_low": 0.1083,
+            "ci_high": 0.2625,
+            "ci_half_width": 0.0771,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "faithfulness": {
+            "mean": 0.0031,
+            "ci_low": 0.0,
+            "ci_high": 0.0094,
+            "ci_half_width": 0.0047,
+            "sample_size": 40,
+            "judge_type": "lexical_support"
+          },
+          "citation_precision": {
+            "mean": 0.4,
+            "ci_low": 0.25,
+            "ci_high": 0.55,
+            "ci_half_width": 0.15,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "citation_recall": {
+            "mean": 0.1772,
+            "ci_low": 0.095,
+            "ci_high": 0.2739,
+            "ci_half_width": 0.0894,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "refusal_accuracy": {
+            "mean": 0.0,
+            "ci_low": 0.0,
+            "ci_high": 0.0,
+            "ci_half_width": 0.0,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "false_refusal_rate": {
+            "mean": 0.0,
+            "ci_low": 0.0,
+            "ci_high": 0.0,
+            "ci_half_width": 0.0,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "hallucination_rate": {
+            "mean": 0.1,
+            "ci_low": 0.025,
+            "ci_high": 0.2,
+            "ci_half_width": 0.0875,
+            "sample_size": 40,
+            "judge_type": "exact"
+          },
+          "temporal_accuracy": {
+            "mean": 0.2833,
+            "ci_low": 0.1708,
+            "ci_high": 0.4042,
+            "ci_half_width": 0.1167,
+            "sample_size": 40,
+            "judge_type": "exact"
+          }
+        },
+        "judge_types": {
+          "faithfulness": "lexical_support",
+          "relevance": "cosine_embedder"
+        },
+        "llm": {
+          "provider": "extractive",
+          "model": "bm25-sentence-extractor",
+          "degraded": true
+        },
+        "thresholds_path": "/Users/datchu/Downloads/Projects/RBI/evals/thresholds.yaml",
+        "rag_answer_type": "agent.types.RagAnswer",
+        "system_registry": "evals/systems.py",
+        "degraded_reasons": [
+          "Using extractive sentence fallback in default test environment without API keys"
+        ]
+      },
+      "counts": {
+        "total_questions": 100,
+        "dev_questions": 60,
+        "test_questions": 40
+      },
+      "notes": [
+        "Phase 4 evaluation set v1 frozen and baseline RAG benchmarked",
+        "Full 100 questions verified against real RBI corpus chunks"
+      ]
     }
   }
 }

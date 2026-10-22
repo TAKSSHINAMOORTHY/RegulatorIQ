@@ -1,0 +1,32 @@
+system_name: baseline
+split: test
+overall_score_floor: 0.15
+metric_gates:
+  recall_at_5:
+    floor: 0.35
+    baseline_mean: 0.5422
+    tolerance: 0.1144
+  hit_at_5:
+    floor: 0.55
+    baseline_mean: 0.775
+    tolerance: 0.125
+  mrr:
+    floor: 0.4
+    baseline_mean: 0.5967
+    tolerance: 0.1338
+  ndcg_at_10:
+    floor: 0.35
+    baseline_mean: 0.5258
+    tolerance: 0.1184
+  doc_recall_at_5:
+    floor: 0.6
+    baseline_mean: 0.8375
+    tolerance: 0.1063
+  answer_correctness:
+    floor: 0.08
+    baseline_mean: 0.1833
+    tolerance: 0.0771
+  citation_precision:
+    floor: 0.2
+    baseline_mean: 0.4
+    tolerance: 0.15

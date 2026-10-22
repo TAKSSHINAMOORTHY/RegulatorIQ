@@ -49,7 +49,7 @@ test-live:
 	$(PYTEST) -m live tests/live/
 
 test-all:
-	$(PYTEST) --cov=config --cov=ingest --cov=retrieval --cov=agent --cov=api --cov-report=term-missing tests/
+	$(PYTEST) --cov=config --cov=ingest --cov=retrieval --cov=agent --cov=evals --cov=api --cov-report=term-missing tests/
 
 lint:
 	$(RUFF) check config/ ingest/ retrieval/ agent/ api/ evals/ scripts/ tests/
@@ -89,6 +89,21 @@ index-publish:
 
 verify-p3:
 	$(PYTHON) scripts/verify_p3.py
+
+eval-gen:
+	$(PYTHON) -c "from evals.generate import EvalSetGenerator, freeze_eval_set; from retrieval.index_store import IndexStore; s = IndexStore.load(verify='fast'); g = EvalSetGenerator(s); q, m = g.generate_eval_set(); freeze_eval_set(q, m); print('Evaluation set generated and frozen successfully!')"
+
+eval:
+	$(PYTHON) evals/run.py --system $(or $(SYSTEM),baseline) --split $(or $(SPLIT),all)
+
+eval-gate:
+	$(PYTHON) evals/gate.py --system $(or $(SYSTEM),baseline)
+
+eval-compare:
+	$(PYTHON) evals/compare.py $(A) $(B)
+
+verify-p4:
+	$(PYTHON) scripts/verify_p4.py
 
 clean-data:
 	rm -rf data/raw/* data/interim/* data/manifests/*

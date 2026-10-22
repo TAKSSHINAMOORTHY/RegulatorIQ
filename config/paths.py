@@ -74,6 +74,14 @@ CORPUS_REPORT_MD = REPORTS_DIR / "corpus_report.md"
 CORPUS_REPORT_JSON = REPORTS_DIR / "corpus_report.json"
 INDEX_REPORT_MD = REPORTS_DIR / "index_report.md"
 INDEX_REPORT_JSON = REPORTS_DIR / "index_report.json"
+EVAL_BASELINE_REPORT_MD = REPORTS_DIR / "eval_baseline.md"
+
+# Evaluation and Benchmarking
+EVAL_SET_PATH = EVALS_DIR / "eval_set.v1.jsonl"
+EVAL_SET_META = EVALS_DIR / "eval_set.v1.meta.json"
+RUNS_DIR = EVALS_DIR / "runs"
+BASELINES_DIR = EVALS_DIR / "baselines"
+THRESHOLDS_PATH = EVALS_DIR / "thresholds.yaml"
 
 # Auto-create essential directories on import
 for directory in (
@@ -92,5 +100,8 @@ for directory in (
     DOCS_DIR,
     LEGAL_DOCS_DIR,
     EVALS_DIR,
+    RUNS_DIR,
+    BASELINES_DIR,
+    LLM_CACHE_DIR,
 ):
     directory.mkdir(parents=True, exist_ok=True)
