@@ -153,6 +153,33 @@ mock-api:
 verify-p7:
 	$(PYTHON) scripts/verify_p7.py
 
+web-install:
+	cd web && npm ci || npm install
+
+web-types:
+	cd web && npm run types:generate
+
+web-types-check:
+	cd web && npm run types:check
+
+web-build:
+	cd web && npm run build
+
+web-test:
+	cd web && npm test
+
+web-dev:
+	cd web && npm run dev
+
+web-start:
+	cd web && npm run start
+
+web-assets:
+	$(PYTHON) scripts/generate_web_assets.py
+
+verify-p8:
+	$(PYTHON) scripts/verify_p8.py
+
 clean-data:
 	rm -rf data/raw/* data/interim/* data/manifests/*
 

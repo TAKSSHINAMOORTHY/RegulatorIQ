@@ -484,6 +484,36 @@
         },
         "coverage_pct": 85.0
       }
+    },
+    "8": {
+      "status": "complete",
+      "artifacts": {
+        "web_dir": "web",
+        "build_ok": true,
+        "env_vars": [
+          "NEXT_PUBLIC_API_URLS",
+          "NEXT_PUBLIC_API_URL"
+        ],
+        "api_client_path": "web/lib/apiClient.ts",
+        "failover_tested": true,
+        "bundle": {
+          "initial_js_kb_gz": 115,
+          "budget_kb_gz": 180
+        },
+        "contrast_report_path": "docs/design/contrast_report.md",
+        "screenshots_dir": "docs/design/screenshots",
+        "design_research_path": "docs/design/RESEARCH.md",
+        "design_system_path": "docs/design/DESIGN_SYSTEM.md",
+        "background": {
+          "tiers_supported": [
+            "webgl",
+            "canvas",
+            "static"
+          ],
+          "governor_tested": true
+        },
+        "vercel_ready": true
+      }
     }
   }
 }

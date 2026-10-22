@@ -110,6 +110,16 @@ TRACE_LOG_DIR = REPORTS_DIR / "logs" / "traces"
 FEEDBACK_DIR = DATA_DIR / "feedback"
 FEEDBACK_PATH = FEEDBACK_DIR / "feedback.jsonl"
 
+# Phase 8 Frontend Paths
+WEB_DIR = ROOT / "web"
+DESIGN_DIR = DOCS_DIR / "design"
+
+# Phase 9 Deployment Paths
+DEPLOY_DIR = ROOT / "deploy"
+DOCKER_DIR = ROOT / "docker"
+WORKFLOWS_DIR = ROOT / ".github" / "workflows"
+DEPLOYMENTS_FILE = DEPLOY_DIR / "deployments.json"
+
 # Auto-create essential directories on import
 for directory in (
     DATA_DIR,

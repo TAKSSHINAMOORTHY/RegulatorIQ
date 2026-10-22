@@ -1,0 +1,33 @@
+# Plan: Prompt 8 of 10 - Frontend ("Ledger Aurora")
+
+- [ ] STEP 0: Handover & Design Research
+  - [ ] Add WEB_DIR and DESIGN_DIR constants to config/paths.py
+  - [ ] Generate docs/design/RESEARCH.md logging design references and adopted principles
+- [ ] PART A: Design Tokens & Contrast Validation
+  - [ ] Define tokens in web/styles/tokens.css and web/lib/design/tokens.ts
+  - [ ] Implement scripts/check_contrast.ts and generate docs/design/contrast_report.md (WCAG AA)
+  - [ ] Create docs/design/DESIGN_SYSTEM.md
+- [ ] PART B & C: Next.js Project & Core Libraries
+  - [ ] Initialize Next.js in web/ with TypeScript, Tailwind CSS, Lucide icons, next-themes
+  - [ ] Generate types from docs/openapi.json and agent/events.schema.json into web/lib/generated/
+  - [ ] Implement web/lib/apiClient.ts (failover, health probe, typed errors)
+  - [ ] Implement web/lib/sse.ts (fetch + ReadableStream SSE parser)
+  - [ ] Implement web/lib/reducer.ts (pure conversation state reducer)
+  - [ ] Implement web/lib/storage.ts (on-device local history and preferences)
+- [ ] PART D & F: Components & UI Pages
+  - [ ] Layout (Top bar, main chat, Sources side panel, history drawer, footer disclaimer)
+  - [ ] Composer (auto-growing, filters, keyboard shortcuts)
+  - [ ] Message rendering & AgentTimeline steps
+  - [ ] Source cards with status stamps (CURRENT, SUPERSEDED, etc.)
+  - [ ] Refusal, clarification, rate-limited, and cold-start waking cards
+  - [ ] About page and Status page
+  - [ ] Motion hook and reduced motion support
+- [ ] PART E: Live Background System
+  - [ ] web/components/background/LiveBackground.tsx
+  - [ ] web/components/background/policy.ts (tier selection: webgl, canvas, static)
+  - [ ] Governor (frame rate monitoring, adaptive scaling)
+- [ ] PART H & I: Verification & Tests
+  - [ ] Unit & component tests for apiClient, sse, reducer, storage, contrast, and background policy
+  - [ ] Test build (npm run build)
+  - [ ] Implement scripts/verify_p8.py
+  - [ ] Update docs/STATE.json
