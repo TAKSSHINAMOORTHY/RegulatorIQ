@@ -1,0 +1,42 @@
+# Plan: Prompt 7 of 10 - Production API (FastAPI)
+
+- [ ] STEP 0: HANDOFF CHECK (`make verify-p6`, read STATE.json, constants in config/paths.py)
+- [ ] PART A: STRUCTURE AND DEPENDENCIES (fastapi, uvicorn, pydantic v2, pydantic-settings, sse-starlette, httpx, orjson)
+- [ ] PART B: LIFECYCLE AND READINESS (api/lifespan.py, api/state.py, background bootstrap, mode resolution, graceful shutdown)
+- [ ] PART C: ENDPOINTS (api/routes/)
+  - [ ] C1. GET /health (liveness, <5ms)
+  - [ ] C2. GET /ready (readiness state machine, 503 while loading, 200 when ready)
+  - [ ] C3. POST /warmup (token auth, constant-time compare, no LLM calls)
+  - [ ] C4. POST /ask (streaming SSE with events.schema.json contract, non-streaming JSON, cancellation)
+  - [ ] C5. Output sanitiser (drop non-rbi.org.in URLs, file paths, secrets)
+  - [ ] C6. POST /feedback (store to JSONL/file, Langfuse score)
+  - [ ] C7. GET /meta (version, mode, corpus counts, disclaimer)
+  - [ ] C8. GET /version (git sha, index version)
+  - [ ] C9. GET /metrics (Prometheus text, auth token)
+- [ ] PART D: SECURITY MIDDLEWARE (api/security.py, api/ratelimit.py, api/budget.py)
+  - [ ] D1. CORS allowlist from CORS_ALLOWED_ORIGINS
+  - [ ] D2. Security headers (HSTS, nosniff, frame-ancestors none)
+  - [ ] D3. Request size limits (413 body cap while streaming)
+  - [ ] D4. Rate limiting (in-memory token bucket, per-IP, retry_after_s)
+  - [ ] D5. Budget guard (GLOBAL_DAILY_LLM_CALLS, degrade to RULES mode)
+  - [ ] D6. Safe error handlers (no stack traces, no leaked internals)
+- [ ] PART E: OBSERVABILITY (api/observability.py)
+  - [ ] E1. LangfuseTracer (spans, generation records, scores)
+  - [ ] E2. LocalJsonlTracer (rotating fallback files)
+  - [ ] E3. Structured JSON logging
+- [ ] PART F: PREFLIGHT AND INDEX FETCH CLI
+  - [ ] F1. python -m api.preflight (exit codes 0, 78, 1)
+  - [ ] F2. python -m api.index_fetch (Range resume, sha256 check, safe extract)
+- [ ] PART G: CONTRACT ARTIFACTS
+  - [ ] G1. make openapi -> docs/openapi.json
+  - [ ] G2. make events-doc -> docs/events.md
+  - [ ] G3. docs/API.md
+  - [ ] G4. scripts/mock_api.py (scenario streams with [[scenario:...]] selector)
+- [ ] PART H: TESTS
+  - [ ] Unit tests for settings, state, security, ratelimit, preflight, sanitiser
+  - [ ] Property-based tests with Hypothesis
+  - [ ] Contract tests (schemathesis, events schema)
+  - [ ] Integration tests with AsyncClient
+  - [ ] Security suite (25 adversarial inputs)
+  - [ ] Load smoke test
+- [ ] PART I: EXECUTION ORDER (`make ci`, `make verify-p7`, commit "phase 7: ...")

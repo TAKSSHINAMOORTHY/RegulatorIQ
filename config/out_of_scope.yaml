@@ -1,3 +1,18 @@
+patterns:
+  - "(?i)passport"
+  - "(?i)cricket"
+  - "(?i)income\\s+tax"
+  - "(?i)cbdt"
+  - "(?i)bollywood"
+  - "(?i)movie\\s+box\\s+office"
+  - "(?i)weather\\s+forecast"
+  - "(?i)rainfall"
+  - "(?i)cbse"
+  - "(?i)motor\\s+vehicle"
+  - "(?i)transport\\s+office"
+  - "(?i)rto\\b"
+  - "(?i)visa\\s+requirement"
+
 out_of_scope_questions:
   - question: "Who won the ICC Cricket World Cup in 2023?"
     expected_refusal_reason: "Sports query outside RBI banking regulation"

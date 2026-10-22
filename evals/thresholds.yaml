@@ -30,7 +30,6 @@ metric_gates:
     floor: 0.2
     baseline_mean: 0.4
     tolerance: 0.15
-
 systems:
   baseline:
     metric_gates:
@@ -55,25 +54,70 @@ systems:
         baseline_mean: 0.8375
         tolerance: 0.1063
   hybrid_rerank_context:
-    overall_score_floor: 0.20
+    overall_score_floor: 0.2
     metric_gates:
       recall_at_5:
-        floor: 0.50
+        floor: 0.5
         baseline_mean: 0.6959
         tolerance: 0.083
       hit_at_5:
-        floor: 0.70
-        baseline_mean: 0.8500
-        tolerance: 0.090
+        floor: 0.7
+        baseline_mean: 0.85
+        tolerance: 0.09
       mrr:
         floor: 0.65
         baseline_mean: 0.8863
-        tolerance: 0.070
+        tolerance: 0.07
       ndcg_at_10:
         floor: 0.65
         baseline_mean: 0.8335
         tolerance: 0.075
       doc_recall_at_5:
         floor: 0.75
-        baseline_mean: 0.8800
-        tolerance: 0.080
+        baseline_mean: 0.88
+        tolerance: 0.08
+  rag_best:
+    overall_score_floor: 0.31
+    metric_gates:
+      recall_at_5:
+        floor: 0.37
+        baseline_mean: 0.4935
+        tolerance: 0.08
+      answer_correctness:
+        floor: 0.31
+        baseline_mean: 0.4417
+        tolerance: 0.08
+      citation_precision:
+        floor: 0.45
+        baseline_mean: 0.65
+        tolerance: 0.1
+  agent_rules:
+    overall_score_floor: 0.33
+    metric_gates:
+      recall_at_5:
+        floor: 0.37
+        baseline_mean: 0.4998
+        tolerance: 0.08
+      answer_correctness:
+        floor: 0.46
+        baseline_mean: 0.6583
+        tolerance: 0.08
+      citation_precision:
+        floor: 0.32
+        baseline_mean: 0.45
+        tolerance: 0.1
+  agent_full:
+    overall_score_floor: 0.33
+    metric_gates:
+      recall_at_5:
+        floor: 0.37
+        baseline_mean: 0.4998
+        tolerance: 0.08
+      answer_correctness:
+        floor: 0.46
+        baseline_mean: 0.6583
+        tolerance: 0.08
+      citation_precision:
+        floor: 0.32
+        baseline_mean: 0.45
+        tolerance: 0.1

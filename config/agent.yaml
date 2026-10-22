@@ -1,0 +1,30 @@
+version: 1.0.0
+tuned_on: dev
+default_system: agent_full
+rules_mode_fallback: true
+budgets:
+  max_graph_steps: 14
+  max_llm_calls: 6
+  max_retrieval_rounds: 3
+  max_subquestions: 4
+  wall_clock_timeout_s: 25.0
+  context_token_budget: 3000
+  history_turns: 4
+thresholds:
+  min_relevant_chunks: 2
+  grade_threshold: 0.3
+  refusal_conf_threshold: 0.12
+  clarify_conf_threshold: 0.2
+  selfcheck_support_threshold: 0.7
+graph:
+  xref_max_hops: 2
+  xref_max_docs: 4
+  selfcheck_max_regenerations: 1
+capabilities:
+  router: true
+  decompose: true
+  grade_retry: true
+  validity: true
+  xref: true
+  selfcheck: true
+  clarify: true

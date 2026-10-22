@@ -1,0 +1,9 @@
+{
+  "id": 18,
+  "name": "index_unavailable",
+  "description": "Graceful handling when index is inaccessible",
+  "question": "What is the repo rate?",
+  "history": [],
+  "session_opts": {},
+  "expected_safe_refusal": true
+}

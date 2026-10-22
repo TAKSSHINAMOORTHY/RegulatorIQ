@@ -1,0 +1,10 @@
+{
+  "id": 16,
+  "name": "selfcheck_recovery",
+  "description": "Selfcheck catches discrepancy and regenerates answer successfully",
+  "question": "What is the statutory liquidity ratio percentage?",
+  "history": [],
+  "session_opts": {},
+  "expected_refused": false,
+  "expected_grounding_passed": true
+}

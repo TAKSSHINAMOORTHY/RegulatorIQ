@@ -1,0 +1,38 @@
+{
+  "description": "Immutable event payload streamed to client.",
+  "properties": {
+    "seq": {
+      "description": "Monotonically increasing sequence number (1-indexed)",
+      "title": "Seq",
+      "type": "integer"
+    },
+    "ts": {
+      "description": "Unix epoch timestamp in seconds",
+      "title": "Ts",
+      "type": "number"
+    },
+    "step": {
+      "description": "Agent node or lifecycle stage name",
+      "title": "Step",
+      "type": "string"
+    },
+    "type": {
+      "description": "Event type from contract specification",
+      "title": "Type",
+      "type": "string"
+    },
+    "data": {
+      "additionalProperties": true,
+      "description": "Structured event payload",
+      "title": "Data",
+      "type": "object"
+    }
+  },
+  "required": [
+    "seq",
+    "step",
+    "type"
+  ],
+  "title": "AgentEvent",
+  "type": "object"
+}

@@ -363,8 +363,9 @@ class HybridRetriever:
                 links = self.store.links_for(c.doc_id)
                 superseded_by = None
                 for link in links:
-                    if link.relation in ("superseded_by", "supersedes"):
-                        superseded_by = link.dst_ref_text or link.dst_doc_id
+                    rel = getattr(link, "rel_type", getattr(link, "relation", ""))
+                    if rel in ("superseded_by", "supersedes", "repealed_by"):
+                        superseded_by = getattr(link, "target_circular_no", getattr(link, "target_doc_id", getattr(link, "dst_ref_text", getattr(link, "dst_doc_id", None))))
                         break
 
             fused_score = round(final_score_map[cid], 6)

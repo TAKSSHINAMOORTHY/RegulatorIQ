@@ -1,0 +1,11 @@
+{
+  "id": 9,
+  "name": "ambiguous_entity_clarify",
+  "description": "Ambiguous entity query triggers clarification in interactive mode and assumption in batch",
+  "question": "What is the minimum capital adequacy ratio for this ambiguous entity?",
+  "history": [],
+  "session_opts": {
+    "interactive": true
+  },
+  "expected_clarification": true
+}

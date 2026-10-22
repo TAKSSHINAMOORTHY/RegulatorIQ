@@ -1,0 +1,27 @@
+# Prompt Injection and Security Guard Patterns
+injection_patterns:
+  - "(?i)ignore\\s+(?:all\\s+)?(?:previous|prior|above)\\s+instructions"
+  - "(?i)disregard\\s+(?:all\\s+)?(?:previous|prior|above)\\s+instructions"
+  - "(?i)forget\\s+(?:all\\s+)?(?:previous|prior|above)\\s+(?:rules|instructions|prompts)"
+  - "(?i)reveal\\s+(?:your\\s+)?(?:system\\s+)?prompt"
+  - "(?i)print\\s+(?:your\\s+)?(?:system\\s+)?prompt"
+  - "(?i)output\\s+(?:your\\s+)?(?:initialization|system)\\s+instructions"
+  - "(?i)what\\s+are\\s+your\\s+(?:system\\s+)?instructions"
+  - "(?i)you\\s+are\\s+now\\s+(?:dan|jailbreak|unfiltered)"
+  - "(?i)pretend\\s+you\\s+are\\s+(?:an?\\s+)?(?:unfiltered|jailbroken|unrestricted)"
+  - "(?i)from\\s+now\\s+on\\s+you\\s+(?:must|will)\\s+act\\s+as"
+  - "(?i)<tool_call>"
+  - "(?i)<function_call>"
+  - "(?i)\\{\\s*\"(?:tool|function|action)\"\\s*:"
+  - "(?i)system\\s+override\\s*:"
+  - "(?i)\\[system\\s+prompt\\]"
+
+advice_patterns:
+  - "(?i)should\\s+i\\s+invest"
+  - "(?i)which\\s+stock\\s+should\\s+i\\s+buy"
+  - "(?i)will\\s+rbi\\s+approve\\s+my\\s+loan"
+  - "(?i)can\\s+i\\s+get\\s+a\\s+loan"
+  - "(?i)how\\s+should\\s+i\\s+invest\\s+my\\s+money"
+  - "(?i)is\\s+it\\s+safe\\s+to\\s+invest\\s+in"
+  - "(?i)advise\\s+me\\s+on\\s+my\\s+personal\\s+(?:finances|portfolio|savings)"
+  - "(?i)tell\\s+me\\s+which\\s+bank\\s+shares?\\s+to\\s+buy"

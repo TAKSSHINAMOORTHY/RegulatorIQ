@@ -1,0 +1,12 @@
+{
+  "id": 5,
+  "name": "amendment_chain",
+  "description": "Amendment chain A <- B <- C resolution",
+  "question": "What are the KYC norms as amended by recent directions?",
+  "history": [],
+  "session_opts": {},
+  "expected_refused": false,
+  "expected_substrings": [
+    "as amended by"
+  ]
+}

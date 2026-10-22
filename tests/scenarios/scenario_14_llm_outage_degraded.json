@@ -1,0 +1,12 @@
+{
+  "id": 14,
+  "name": "llm_outage_degraded",
+  "description": "LLM outage mid-run gracefully finishes using rules fallback",
+  "question": "What are the rules under circular RBI/2025-26/10?",
+  "history": [],
+  "session_opts": {
+    "mode": "rules"
+  },
+  "expected_refused": false,
+  "expected_mode": "rules"
+}

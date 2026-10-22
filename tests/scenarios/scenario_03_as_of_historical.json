@@ -1,0 +1,12 @@
+{
+  "id": 3,
+  "name": "as_of_historical",
+  "description": "Historical validity query as of past date",
+  "question": "What was the limit as of 2021-04-01?",
+  "history": [],
+  "session_opts": {
+    "as_of": "2021-04-01"
+  },
+  "expected_refused": false,
+  "expected_as_of": "2021-04-01"
+}

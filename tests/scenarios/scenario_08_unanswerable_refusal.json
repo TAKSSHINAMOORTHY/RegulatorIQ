@@ -1,0 +1,10 @@
+{
+  "id": 8,
+  "name": "unanswerable_refusal",
+  "description": "Unanswerable query outside banking regulation triggers polite refusal",
+  "question": "What is the procedure to apply for an Indian passport at regional passport offices?",
+  "history": [],
+  "session_opts": {},
+  "expected_refused": true,
+  "expected_refusal_contains": "outside the regulatory scope"
+}

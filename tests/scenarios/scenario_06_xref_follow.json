@@ -1,0 +1,10 @@
+{
+  "id": 6,
+  "name": "xref_follow",
+  "description": "Cross-reference follow across related circulars",
+  "question": "What does Section 42 of RBI Act reference in circular RBI/2025-26/10?",
+  "history": [],
+  "session_opts": {},
+  "expected_refused": false,
+  "expected_xref_traversed": true
+}

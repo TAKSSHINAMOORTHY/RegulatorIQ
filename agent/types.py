@@ -47,3 +47,12 @@ class RagAnswer:
     usage: Dict[str, int]
     provider: str
     model: str
+    trace: List[Dict[str, Any]] = field(default_factory=list)
+    steps: int = 0
+    llm_calls: int = 0
+    clarification: Optional[Dict[str, Any]] = None
+    validity_findings: List[Dict[str, Any]] = field(default_factory=list)
+    grounding_report: Optional[Dict[str, Any]] = None
+    mode: str = "rules"
+    degraded_flags: List[str] = field(default_factory=list)
+    disclaimer_key: str = "regulatory_disclaimer"

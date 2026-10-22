@@ -1,0 +1,11 @@
+{
+  "id": 4,
+  "name": "two_doc_comparison",
+  "description": "Two document comparison with decomposition",
+  "question": "Compare CRR requirements for Scheduled Commercial Banks and Urban Co-operative Banks",
+  "history": [],
+  "session_opts": {},
+  "expected_refused": false,
+  "expected_strategy": "compare",
+  "min_subquestions": 2
+}

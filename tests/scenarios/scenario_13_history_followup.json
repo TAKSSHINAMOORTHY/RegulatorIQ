@@ -1,0 +1,15 @@
+{
+  "id": 13,
+  "name": "history_followup",
+  "description": "Elliptical follow-up question resolved via conversation history",
+  "question": "Is it still in force?",
+  "history": [
+    {
+      "question": "What is circular RBI/2025-26/10?",
+      "answer": "It specifies CRR norms."
+    }
+  ],
+  "session_opts": {},
+  "expected_refused": false,
+  "expected_condensed": true
+}

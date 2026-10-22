@@ -56,7 +56,7 @@ lint:
 	$(RUFF) format --check config/ ingest/ retrieval/ agent/ api/ evals/ scripts/ tests/
 
 typecheck:
-	PYTHONPATH=. $(MYPY) config/ ingest/ retrieval/ scripts/
+	PYTHONPATH=. $(MYPY) config/ ingest/ retrieval/ agent/ scripts/
 
 ci: lint typecheck test-all
 
@@ -113,6 +113,21 @@ ablate:
 
 verify-p5:
 	$(PYTHON) scripts/verify_p5.py
+
+agent-tune:
+	$(PYTHON) scripts/tune_agent.py
+
+agent-eval:
+	$(PYTHON) scripts/run_agent_eval.py
+
+agent-report:
+	$(PYTHON) scripts/run_agent_eval.py
+
+agent-demo:
+	$(PYTHON) -m agent.demo --question "$(Q)"
+
+verify-p6:
+	$(PYTHON) scripts/verify_p6.py
 
 clean-data:
 	rm -rf data/raw/* data/interim/* data/manifests/*

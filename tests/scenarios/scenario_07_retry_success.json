@@ -1,0 +1,10 @@
+{
+  "id": 7,
+  "name": "retry_success",
+  "description": "Initial retrieval partial, query rewrite retry yields results",
+  "question": "What is the liquidity requirement under SLR for banking companies?",
+  "history": [],
+  "session_opts": {},
+  "expected_refused": false,
+  "min_rounds": 1
+}

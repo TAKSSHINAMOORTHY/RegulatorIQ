@@ -1,0 +1,45 @@
+# Plan: Prompt 6 of 10 - Agentic RAG (LangGraph)
+
+- [x] STEP 0: HANDOFF CHECK (`make verify-p5`, read STATE.json, constants in config/paths.py)
+- [x] PART A: DEPENDENCIES AND STRUCTURE
+  - [x] A1. Install langgraph, pydantic v2 models, plain Python functions
+  - [x] A2. Modules: agent/state.py, agent/nodes/*.py, agent/graph.py, agent/runner.py, agent/guards.py, agent/policy.py, agent/validity.py, agent/xref.py, agent/selfcheck.py, agent/tracing.py, agent/events.py
+  - [x] A3. Prompts: 9 versioned files with sha256 logging and explicit untrusted delimiters
+- [x] PART B: STATE, BUDGETS, CONFIG
+  - [x] B1. AgentState pydantic model with plan, evidence, grades, validity, xref, budget
+  - [x] B2. config/agent.yaml with max_graph_steps=14, max_llm_calls=6, max_rounds=3
+  - [x] B3. Hard budget guard terminating within 14 steps
+- [x] PART C: THE GRAPH (agent/graph.py)
+  - [x] C1. guard (length limit, injection patterns, PII detection & redaction, scope check)
+  - [x] C2. condense (elliptical follow-up standalone question)
+  - [x] C3. route (intent classification, chitchat bypass, regulatory protection)
+  - [x] C4. clarify (interactive clarification vs batch assumption statement)
+  - [x] C5. decompose (multi-part conjunction query planning)
+  - [x] C6. retrieve (per sub-question retrieval)
+  - [x] C7. grade (relevance assessment)
+  - [x] C8. rewrite_retry (failure-reason query reformulation)
+  - [x] C9. validity (supersession graph resolution)
+  - [x] C10. xref (cross-reference traversal)
+  - [x] C11. generate (FULL & RULES mode generation)
+  - [x] C12. selfcheck (factual number/date/citation audit)
+  - [x] C13. finalize (RagAnswer construction, URL filtering)
+- [x] PART D: STREAMING AND EVENTS (agent/events.py, agent/events.schema.json)
+- [x] PART E: TRACING INTERFACE (agent/tracing.py)
+- [x] PART F: AGENT EVALUATION AND TUNING
+  - [x] F1. Register systems in evals/systems.py
+  - [x] F2. Tune on DEV only (5-fold CV, freeze in agent.yaml with tuned_on: dev)
+  - [x] F3. Evaluate with harness (test split 1-touch guard)
+  - [x] F4. reports/agent_report.md trade-off analysis
+  - [x] F5. Gates: update evals/thresholds.yaml and claims.md
+- [x] PART G: SECURITY AND SAFETY BEHAVIOUR
+  - [x] G1. Delimiters around untrusted text
+  - [x] G2. Output safety (only rbi.org.in URLs)
+  - [x] G3. Reasoning privacy
+  - [x] G4. Abuse limits
+- [x] PART H: TESTS
+  - [x] Unit per node (FakeLLM, FakeRetriever)
+  - [x] Scenario tests (all 18 golden traces in tests/scenarios/*.json)
+  - [x] Property-based tests (Hypothesis termination & budget invariants)
+  - [x] Concurrency test (16 parallel threads)
+  - [x] Metric validity tests
+- [x] PART I: EXECUTION ORDER (`make ci`, `make verify-p6`, commit & push)

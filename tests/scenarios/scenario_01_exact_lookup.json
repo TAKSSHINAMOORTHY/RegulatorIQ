@@ -1,0 +1,12 @@
+{
+  "id": 1,
+  "name": "exact_lookup",
+  "description": "Exact circular ID lookup retrieves and answers correctly",
+  "question": "What is the requirement in circular RBI/2025-26/90?",
+  "history": [],
+  "session_opts": {},
+  "expected_refused": false,
+  "expected_intent": "lookup",
+  "expected_citations_min": 1,
+  "expected_status": "current"
+}

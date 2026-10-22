@@ -31,6 +31,7 @@ REPORTS_DIR = Path(os.environ.get("RBI_REPORTS_DIR", ROOT / "reports"))
 DOCS_DIR = Path(os.environ.get("RBI_DOCS_DIR", ROOT / "docs"))
 CONFIG_DIR = Path(os.environ.get("RBI_CONFIG_DIR", ROOT / "config"))
 EVALS_DIR = Path(os.environ.get("RBI_EVALS_DIR", ROOT / "evals"))
+TESTS_DIR = ROOT / "tests"
 
 # Data contract subdirectories
 RAW_DATA_DIR = DATA_DIR / "raw"
@@ -92,6 +93,16 @@ PROMPT_RAG_V2_PATH = ROOT / "agent" / "prompts" / "rag.v2.txt"
 ABLATION_REPORT_MD = REPORTS_DIR / "ablation.md"
 CLAIMS_MD = REPORTS_DIR / "claims.md"
 
+# Phase 6 Agentic RAG Paths
+AGENT_CONFIG = CONFIG_DIR / "agent.yaml"
+AGENT_PROMPTS_DIR = ROOT / "agent" / "prompts"
+EVENTS_SCHEMA = ROOT / "agent" / "events.schema.json"
+AGENT_RUNS_DIR = RUNS_DIR
+SCENARIOS_DIR = TESTS_DIR / "scenarios"
+INJECTION_PATTERNS_PATH = CONFIG_DIR / "injection_patterns.yaml"
+AGENT_REPORT_MD = REPORTS_DIR / "agent_report.md"
+AGENT_TUNING_LOG = ABLATION_DIR / "agent_tuning_log.jsonl"
+
 # Auto-create essential directories on import
 for directory in (
     DATA_DIR,
@@ -114,5 +125,7 @@ for directory in (
     LLM_CACHE_DIR,
     ABLATION_DIR,
     RERANK_CACHE_DIR,
+    AGENT_PROMPTS_DIR,
+    SCENARIOS_DIR,
 ):
     directory.mkdir(parents=True, exist_ok=True)

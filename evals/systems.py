@@ -320,3 +320,132 @@ register_system(
         **kw,
     ),
 )
+
+
+# ---------------------------------------------------------------------------
+# Phase 6: Agentic Systems and Ablation Ladder
+# ---------------------------------------------------------------------------
+
+
+# Alias: rag_best == hybrid_rerank_context (Prompt 5 winner)
+register_system("rag_best", lambda **kw: get_system("hybrid_rerank_context", **kw))
+
+
+def _build_agent_system(cap_overrides: Dict[str, bool], forced_mode: Optional[str] = None, **kwargs: Any) -> Any:
+    """Builder for agentic systems with customizable capability toggles."""
+    from agent.runner import AgentRunner
+
+    store = kwargs.get("index_store") or kwargs.get("store")
+    if store is None:
+        store = IndexStore.load(verify="fast")
+    llm = kwargs.get("llm")
+
+    overrides: Dict[str, Any] = {"capabilities": dict(cap_overrides)}
+    runner = AgentRunner.from_config(
+        retriever=None,
+        llm=llm,
+        overrides=overrides,
+    )
+    if forced_mode:
+        runner.mode = forced_mode
+    return runner
+
+
+# Full agent in RULES mode (zero-LLM deterministic fallback)
+register_system(
+    "agent_rules",
+    lambda **kw: _build_agent_system(
+        cap_overrides={
+            "router": True,
+            "decompose": True,
+            "grade_retry": True,
+            "validity": True,
+            "xref": True,
+            "selfcheck": True,
+            "clarify": True,
+        },
+        forced_mode="rules",
+        **kw,
+    ),
+)
+
+# Full agent in FULL mode (or auto-resolved)
+register_system(
+    "agent_full",
+    lambda **kw: _build_agent_system(
+        cap_overrides={
+            "router": True,
+            "decompose": True,
+            "grade_retry": True,
+            "validity": True,
+            "xref": True,
+            "selfcheck": True,
+            "clarify": True,
+        },
+        **kw,
+    ),
+)
+
+# Ladder variant 1: rag_best + router
+register_system(
+    "agent_ladder_router",
+    lambda **kw: _build_agent_system(
+        cap_overrides={"router": True, "decompose": False, "grade_retry": False, "validity": False, "xref": False, "selfcheck": False, "clarify": False},
+        **kw,
+    ),
+)
+
+# Ladder variant 2: + grade_retry
+register_system(
+    "agent_ladder_grade",
+    lambda **kw: _build_agent_system(
+        cap_overrides={"router": True, "decompose": False, "grade_retry": True, "validity": False, "xref": False, "selfcheck": False, "clarify": False},
+        **kw,
+    ),
+)
+
+# Ladder variant 3: + decompose
+register_system(
+    "agent_ladder_decompose",
+    lambda **kw: _build_agent_system(
+        cap_overrides={"router": True, "decompose": True, "grade_retry": True, "validity": False, "xref": False, "selfcheck": False, "clarify": False},
+        **kw,
+    ),
+)
+
+# Ladder variant 4: + validity
+register_system(
+    "agent_ladder_validity",
+    lambda **kw: _build_agent_system(
+        cap_overrides={"router": True, "decompose": True, "grade_retry": True, "validity": True, "xref": False, "selfcheck": False, "clarify": False},
+        **kw,
+    ),
+)
+
+# Ladder variant 5: + xref
+register_system(
+    "agent_ladder_xref",
+    lambda **kw: _build_agent_system(
+        cap_overrides={"router": True, "decompose": True, "grade_retry": True, "validity": True, "xref": True, "selfcheck": False, "clarify": False},
+        **kw,
+    ),
+)
+
+# Ladder variant 6: + selfcheck
+register_system(
+    "agent_ladder_selfcheck",
+    lambda **kw: _build_agent_system(
+        cap_overrides={"router": True, "decompose": True, "grade_retry": True, "validity": True, "xref": True, "selfcheck": True, "clarify": False},
+        **kw,
+    ),
+)
+
+# Ladder variant 7: + clarify (non-interactive: assumptions) == agent_full
+register_system(
+    "agent_ladder_clarify",
+    lambda **kw: _build_agent_system(
+        cap_overrides={"router": True, "decompose": True, "grade_retry": True, "validity": True, "xref": True, "selfcheck": True, "clarify": True},
+        **kw,
+    ),
+)
+

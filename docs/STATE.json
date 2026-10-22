@@ -428,6 +428,25 @@
         "Calibrated confidence model fit on dev and verified",
         "Strict test split discipline enforced (1 touch per system recorded in test_touch_log.jsonl)"
       ]
+    },
+    "6": {
+      "status": "complete",
+      "artifacts": {
+        "agent_runner_entrypoint": "agent.runner:AgentRunner",
+        "agent_config_path": "config/agent.yaml",
+        "agent_prompts_dir": "agent/prompts",
+        "events_schema_path": "agent/events.schema.json",
+        "agent_report_path": "reports/agent_report.md",
+        "claims_path": "reports/claims.md",
+        "default_system": "agent_full",
+        "tuned_on": "dev",
+        "test_touch_log_path": "evals/test_touch_log.jsonl",
+        "scenarios_passed": 18,
+        "degraded_reasons": []
+      },
+      "notes": [
+        "Phase 6 complete: Bounded LangGraph Agentic RAG with dynamic routing, decomposition, grading, validity resolution, cross-referencing, self-checking hallucination guard, streaming events, and ablation report"
+      ]
     }
   }
 }

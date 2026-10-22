@@ -1,5 +1,7 @@
 # Prompts folder - DO NOT PUSH
 prompts/
+shared_prompt.txt
+docs/shared_prompt.txt
 
 # Python
 __pycache__/

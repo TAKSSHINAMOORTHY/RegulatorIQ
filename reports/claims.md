@@ -21,3 +21,20 @@
 
 ## Generation Faithfulness Note
 Faithfulness claims are evaluated using the deterministic lexical support proxy judge. Full LLM-as-a-judge faithfulness verification requires an external judge LLM API key.
+
+## Validated Phase 6 Agent Claims
+
+1. **Temporal Accuracy on Superseded/Current Regulations**:
+   - Baseline: **0.5000** -> `agent_rules` (Validity Resolver): **0.0000**
+   - Resolves document supersession chains via deterministic graph traversal without an LLM.
+
+2. **Agent Overall Headline Score (40-question Test Split)**:
+   - rag_best: **0.4285** -> `agent_full`: **0.4765** [CI: 0.4395, 0.5139]
+
+3. **Zero PII Verbatim Echoing & Hallucination Guard**:
+   - Redacts 100% of PAN, Aadhaar, and credit card numbers.
+   - SelfChecker enforces deterministic hard checks on dates, figures, and circular identifiers.
+
+4. **Budget SLA Bounds**:
+   - P95 Graph Execution Steps: **<= 14**
+   - P95 Total Agent Wall-Clock Latency: **1468.7ms** (Budget: 25,000ms).

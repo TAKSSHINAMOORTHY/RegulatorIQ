@@ -1,0 +1,13 @@
+{
+  "id": 2,
+  "name": "superseded_to_current",
+  "description": "Superseded Master Circular followed to current Master Direction",
+  "question": "What is the active rule for capital adequacy given RBI/2020-21/10?",
+  "history": [],
+  "session_opts": {},
+  "expected_refused": false,
+  "expected_validity_status": "superseded",
+  "expected_substrings": [
+    "superseded by"
+  ]
+}
