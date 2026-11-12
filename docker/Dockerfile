@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for RegulatorIQ API
 # Base builder stage
-FROM python:3.11-slim AS builder
+FROM python:3.15-slim AS builder
 
 WORKDIR /build
 
@@ -39,7 +39,7 @@ print('FastEmbed model pre-baked successfully!')" || true
 ENV HF_HUB_OFFLINE=1
 
 # Final Runtime Image
-FROM python:3.11-slim AS runtime
+FROM python:3.15-slim AS runtime
 
 WORKDIR /app
 
